@@ -16,14 +16,18 @@ print "current dir: << {} >>".format(os.getcwd())
 # mxd = arcpy.mapping.MapDocument("CURRENT")
 mxd = arcpy.mapping.MapDocument(u"制图表达.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
-target_lyr = arcpy.mapping.ListLayers(mxd)[0]
+# target_lyr = arcpy.mapping.ListLayers(mxd)[0]
 
 representation_name = "repre_test2.lyr"
 representation_lyr = arcpy.mapping.Layer(representation_name)
 
+# ...
+target_lyr = arcpy.mapping.ListLayers(mxd)[0]
 res = arcpy.Describe(target_lyr).children
 for _r in res:
-    print _r.name  # representation_name
+    print _r.name  #① # representation_name
+    print _r.dataType #②  # RepresentationClass
+# ...
 
 # # 删除制图表达后
 # arcpy.DropRepresentation_cartography(target_lyr, "representation_name")
