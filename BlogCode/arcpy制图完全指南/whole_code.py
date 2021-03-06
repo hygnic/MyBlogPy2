@@ -293,14 +293,15 @@ class MakeMXD(object):
         self.mxd.saveACopy(output_dir+'/'+name+'.mxd')
         print("Complete <name: {} size: {}> ".format(name, self.size))
         
-
-# 第三章
-mxd_d = size_creator(mxd_template)
-PageSizeMatch(MI, FIELD, mxd_d)
-
-
-# 第四章
-for a_mxd in [x for x in os.listdir(mxd_template) if ".mxd" or ".MXD" in x]:
-    mxd_fullpath = os.path.join(mxd_template, a_mxd)
-    mxd = arcpy.mapping.MapDocument(mxd_fullpath)
-    MakeMXD(mxd, ["roads","railways","landuse","natural","buildings"], MI, FIELD, SCALE)
+if __name__ == '__main__':
+    
+    # 第三章
+    mxd_d = size_creator(mxd_template)
+    PageSizeMatch(MI, FIELD, mxd_d)
+    
+    
+    # 第四章
+    for a_mxd in [x for x in os.listdir(mxd_template) if ".mxd" or ".MXD" in x]:
+        mxd_fullpath = os.path.join(mxd_template, a_mxd)
+        mxd = arcpy.mapping.MapDocument(mxd_fullpath)
+        MakeMXD(mxd, ["roads","railways","landuse","natural","buildings"], MI, FIELD, SCALE)
