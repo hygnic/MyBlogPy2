@@ -104,7 +104,7 @@ class PageSizeMatch(object):
         """
         :param feature_name: {String} # 制图索引图层的名字
         :param field: {String} field = "CITY" # 检索字段
-        :param mxd_template_d: {Dict} 装有模板大小的字典
+        :param mxd_template_d: {Dict} 模板匹配信息（字典）
         """
         self.f = feature_name # 制图索引图层的名字
         self.field = field
@@ -116,11 +116,11 @@ class PageSizeMatch(object):
     
     def minimum_bounding(self):
         """
-        1.计算最小边界几何，并用结果图层覆盖初始图层;计算过最小边界几何的图层有"MBG_Width"字段
+        1.生成最小边界几何图层（该图层会新增字段"MBG_Width"），并替换初始图层;
         2.创建PAGRSIZE 字段
         :return: 制图索引文件的要素图层
         """
-        if not check_field(MI,"MBG_Width"): # 没有计算过最小几何边界
+        if not check_field(MI,"MBG_Width"):
             short_f = arcpy.MinimumBoundingGeometry_management
             short_f(self.f, "mapping_index_out", "ENVELOPE", "LIST", self.field, True)
             print("create MinimumBoundingGeometry")
