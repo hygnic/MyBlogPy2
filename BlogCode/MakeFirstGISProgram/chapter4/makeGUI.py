@@ -9,7 +9,7 @@ class MyGUI(object):
         self.root = tk.Tk()
         self.root.geometry("450x600+800+200") #设置窗口大小、位置
         self.root.title("GIS") #设置程序名称
-        self.var = tk.StringVar() #<<注释1>>
+        self.var = tk.StringVar()
         
         # run function
         self.create_widget()
@@ -30,7 +30,7 @@ class MyGUI(object):
     
     def open_dialog(self):
         varrr = tkFileDialog.askopenfilename()
-        self.var.set(varrr) #<<注释3>>
+        self.var.set(varrr)
         
     def create_run_button(self):
         # 生成下方的“运行”按钮
@@ -41,7 +41,7 @@ class MyGUI(object):
         self.ok_button.pack(side="right", pady=8)
         self.ok_button.config(command=self.run)
     
-    def run(self): ###
+    def run(self):
         giscode.main(self.var.get())
         
         
