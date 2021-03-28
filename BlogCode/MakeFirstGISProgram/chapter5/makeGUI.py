@@ -42,14 +42,14 @@ class MyGUI(object):
         self.ok_button.pack(side="right", pady=8)
         self.ok_button.config(command=self.run_multiprocessing) #<<注释2>>
     
-    # def run(self):                   #<<注释3>>
+    # def run(self):
     #     giscode.main(self.var.get())
         
     def run_multiprocessing(self): #<<注释4>>
         p = Process(target=giscode.main,
                     args=(self.var.get(),))
-        print "PID:",p.pid
         p.start()
+        print "PID:",p.pid
         
         
 if __name__ == '__main__':
