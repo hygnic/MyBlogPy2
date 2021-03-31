@@ -11,7 +11,8 @@ Usage:
 # ---------------------------------------------------------------------------
 from __future__ import absolute_import
 import arcpy
-from random import randint
+import numpy as np
+import random
 
 def check_field_exit(field_obj, check_field):
     """
@@ -62,11 +63,60 @@ def randvalue(input_feature, field, range):
     :return:
     """
     # add_field()
+    print "rows counts:",arcpy.GetCount_management(input_feature)
     with arcpy.da.UpdateCursor(input_feature, field) as cursor:
+        count = 0
         for row in cursor:
-            row[0]=randint(range[0], range[1])
+            count += 1
+            if count < 3510 or count > 28296:
+                if random.randint(1,10) > 7:
+                    row[0]=random.randint(100, 800)
+                else:
+                    row[0]=random.gauss(range[0], range[1])
+                    
+            elif count < 7200 or count > 24782:
+                if random.randint(1,10) > 8:
+                    row[0]=random.randint(100, 800)
+                else:
+                    row[0]=random.gauss(range[0], range[1])
+
+            elif count < 10530 or count > 21272:
+                if random.randint(1,10) > 9:
+                    row[0]=random.randint(100, 800)
+                else:
+                    row[0]=random.gauss(range[0], range[1])
+
+            else:
+                row[0]=random.gauss(range[0], range[1])
+                
+                # row[0]=random.randint(100, 800)
+            # row[0]=random.randint(range[0], range[1])
             cursor.updateRow(row)
 
+def show_normal_distribution():
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import math
+    
+    
+    def normal_distribution(x, mu, sigma):
+        return np.exp( -1 * ( (x-mu) ** 2) / ( 2 * (sigma ** 2)) ) / (math.sqrt( 2 * np.pi ) * sigma)
+    
+    mu, sigma = 500, 100
+    x = np.linspace( mu - 6 * sigma, mu + 6 * sigma, 100)
+    y = normal_distribution(x, mu, sigma)
+    plt.plot(x, y, 'r', label='mu = 0,sigma = 1')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+
 if __name__ == '__main__':
-    shp_path = ur"D:\文档\mydata\makemysun\v103\gdb.gdb\sun_spilt"
-    randvalue(shp_path, "value",(10,500))
+    shp_path = ur"D:\MyProject\makemysun\gdb.gdb\test"
+    # randvalue(shp_path, "value",(10,500))
+    randvalue(shp_path, "value",(500,100))
+
+    
+    
+    # re = random.gauss(500,1000)
+    # print re
