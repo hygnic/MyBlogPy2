@@ -36,10 +36,7 @@ class MyGUI(object):
         self.but.config(command=self.open_dialog)
         self.but.config(image=self.img1) #<<注释3>>
         self.but.pack(side="right", pady=8)
-
-    
-    
-    
+     
     def open_dialog(self):
         varrr = tkFileDialog.askopenfilename()
         self.var.set(varrr)
