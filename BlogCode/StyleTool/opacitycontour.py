@@ -20,7 +20,7 @@ import sys
 #------------------------------
 #------------path--------------
 #       在导入的情况下
-arcpy.AddMessage("CURRENT: {}".format(os.getcwd()))
+# arcpy.AddMessage("CURRENT: {}".format(os.getcwd()))
 # CURRENT: C:\Windows\system32
 
 # 返回工具箱的完整名称

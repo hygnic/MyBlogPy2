@@ -6,7 +6,7 @@
 # Version:           
 # Reference:         
 """
-Description:         <<缓冲区轮廓>>
+Description:         <<缓冲区轮廓>> 不可扩大缓冲区大小
 Usage:               
 """
 # -------------------------------------------
