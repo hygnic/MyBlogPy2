@@ -23,7 +23,8 @@ def emboss(layer,buffer_distance,out_raster):
     """
     # inner buffer
     in_memory_buffer = "in_memory/buffer02011"
-    arcpy.Buffer_analysis(layer, in_memory_buffer, buffer_distance, "FULL", "ROUND", "NONE", "", "PLANAR")
+    # arcpy.Buffer_analysis(layer, in_memory_buffer, buffer_distance, "FULL", "ROUND", "NONE", "", "PLANAR")
+    arcpy.Buffer_analysis(layer, in_memory_buffer, buffer_distance, "FULL", "ROUND", "NONE")
     # distance
     in_memory_euc = "in_memory/euc_distance"
     arcpy.gp.EucDistance_sa(in_memory_buffer, in_memory_euc, "", "", "")
