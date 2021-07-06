@@ -48,8 +48,10 @@ if __name__ == '__main__':
     # mxd1 = arcpy.mapping.MapDocument("CURRENT")
     # lyr = arcpy.mapping.ListLayers(mxd1, lyrr_name)[0]
     # make emboss effect
+    # 设置处理范围和输出的栅格腌膜范围
     arcpy.env.extent = lyrr_name
     arcpy.env.mask = lyrr_name
+    
     emboss(lyrr_name, input_distance, output_raster)
     arcpy.RefreshActiveView()
     arcpy.RefreshTOC()
