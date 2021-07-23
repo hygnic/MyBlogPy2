@@ -24,7 +24,7 @@ from __future__ import division
 import os
 import arcpy
 import numpy as np
-from math import sin, radians
+from math import sin, radians, pow, sqrt
 
 
 """--------------------------------------"""
@@ -43,12 +43,10 @@ def check_extent(input):
     :return: 原点，宽，高
     """
     lyr = arcpy.mapping.Layer(input)
-    if lyr.isFeatureLayer:
-        lyr_extent = lyr.getExtent()
-        _origin = (lyr_extent.XMin, lyr_extent.YMin)
-        # ((35437617.0031, 3373897.8944), 52000.0, 52000.0)
-    # else:
-    #     如果是栅格图层
+    lyr_extent = lyr.getExtent()
+    _origin = (lyr_extent.XMin, lyr_extent.YMin)
+    if lyr.isRasterLayer:
+        pass
         
     return _origin, lyr_extent.width, \
                lyr_extent.height, lyr_extent.spatialReference
@@ -80,7 +78,10 @@ arcpy.env.overwriteOutput = True
 
 
 # 坐标原点
-lyr_o, lyr_w, lyr_h, sr=check_extent("data/grid.shp")
+# lyr_o, lyr_w, lyr_h, sr=check_extent("data/grid.shp")
+lyr_o, lyr_w, lyr_h, sr=check_extent("tiff.tif")
+print "featureclass width:{}".format(lyr_w)
+print "featureclass height:{}".format(lyr_h)
 origin = lyr_o
 oX = origin[0]
 oY = origin[1]
@@ -166,6 +167,13 @@ offset_y =  5 * leng
 offset_x2 = length*4.5
 offset_y2 = -leng
 
+ratio = lyr_h/(5*leng)
+new_width = length * 3/2 * ratio
+new_hieght= lyr_h
+distance = sqrt(pow(new_width,2) + pow(new_hieght, 2))
+print new_width
+print new_hieght
+print distance
 
 
 # y轴方向循环次数
@@ -194,7 +202,7 @@ print "Len:{}".format(len(np_array)) # 396
 print "Size:{}".format(np_array.size)
 print "Shape:{}".format(np_array.shape)
 print "Ndim:{}".format(np_array.ndim)
-    
+
 loop_x = int(lyr_w/(4*length))
 for _ in xrange(int(loop_x*1.4)):
     tile_creator(np_array, shpfile)
