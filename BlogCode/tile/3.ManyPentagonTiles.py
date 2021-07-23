@@ -4,10 +4,18 @@
 # Author:            Hygnic
 # Created on:        2021/7/22 11:11
 # Version:           
-# Reference:         120°, 120°, 120°, 120°, 60°
-# V3.3.3.3.6
+# Reference:
+
 """
-Description:         构建多个整体
+Description:
+            完全构建五边形密铺。
+            
+            五边形类型：
+            120°, 120°, 120°, 120°, 60°
+            # V3.3.3.3.6
+            https://en.wikipedia.org/wiki/File:1-uniform_10_dual_color1.png
+
+
 Usage:               
 """
 # -------------------------------------------
@@ -15,15 +23,18 @@ from __future__ import absolute_import
 from __future__ import division
 import os
 import arcpy
-from pprint import pprint
 import numpy as np
-from math import pi, exp, cos, sin, radians
+from math import sin, radians
 
-"""---------------------"""
-"""---------基本属性-----------"""
-ws = os.path.abspath(os.getcwd())
-arcpy.env.workspace = ws
-arcpy.env.overwriteOutput = True
+
+"""--------------------------------------"""
+"""--------基本方法------"""
+
+# def conver_point2polgon(a_list):
+#     """将普通的点数据转换成可以制作要素的面"""
+#     point_obj = [arcpy.Point(i[0], i[1]) for i in a_list]
+#     polygon = arcpy.Polygon(arcpy.Array(point_obj))
+#     return polygon
 
 def check_extent(input):
     """
@@ -32,30 +43,66 @@ def check_extent(input):
     :return: 原点，宽，高
     """
     lyr = arcpy.mapping.Layer(input)
-    lyr_extent = lyr.getExtent()
-    _origin = (lyr_extent.XMin, lyr_extent.YMin)
-    # ((35437617.0031, 3373897.8944), 52000.0, 52000.0)
+    if lyr.isFeatureLayer:
+        lyr_extent = lyr.getExtent()
+        _origin = (lyr_extent.XMin, lyr_extent.YMin)
+        # ((35437617.0031, 3373897.8944), 52000.0, 52000.0)
+    # else:
+    #     如果是栅格图层
+        
     return _origin, lyr_extent.width, \
-           lyr_extent.height, lyr_extent.spatialReference
+               lyr_extent.height, lyr_extent.spatialReference
 
-lyr_o, lyr_w, lyr_h, sr=check_extent("data/grid.shp")
+
+def tile_creator(array_obj, featurecalss):
+    """
+    将 array_obj 中的点去除然后生成面
+    :param array_obj:
+    :param featurecalss: 矢量文件
+    :return:
+    """
+    _rows = arcpy.da.InsertCursor(featurecalss, "SHAPE@")
+    for _ii in array_obj:
+        _rows.insertRow([_ii])
+    del _rows
+
+
+"""--------基本方法------"""
+"""--------------------------------------"""
+
+
+"""--------------------------------------"""
+"""--------基本属性------"""
+
+ws = os.path.abspath(os.getcwd())
+arcpy.env.workspace = ws
+arcpy.env.overwriteOutput = True
 
 
 # 坐标原点
+lyr_o, lyr_w, lyr_h, sr=check_extent("data/grid.shp")
 origin = lyr_o
 oX = origin[0]
 oY = origin[1]
-print "origin X:".format(oX)
-print "origin Y:".format(oY)
+print "origin X:{}".format(oX)
+print "origin Y:{}".format(oY)
+# 五边形短边长度
 length = 300
+# 角度
 angle01 = 60
-
-"""---------基本属性-----------"""
-"""---------------------"""
 
 # 垂直距离
 leng = length * sin(radians(angle01))  # 300*sin60°
-# double_length = length*2
+
+"""--------基本属性------"""
+"""--------------------------------------"""
+
+
+
+
+"""--------------------------------------"""
+"""--------基本坐标------"""
+#一组五边形在坐标四个象限内的坐标
 
 pta = (oX + length * 2, oY)
 ptb = (pta[0] + length / 2, oY + leng)
@@ -99,28 +146,35 @@ pts = [origin, pta, ptb, ptc, ptd, pte,
 # E = quadrant3[4:]+[quadrant4[5],quadrant4[4],origin]
 # F = quadrant4[:-1]
 
+"""--------基本坐标------"""
+"""--------------------------------------"""
 
 
-"""---------------------"""
+
+
+"""--------------------------------------"""
 """--------构建要素------"""
-
-
-
-def conver_point2Polgon(a_list):
-    """将普通的点数据转换成可以制作要素的面"""
-    point_obj = [arcpy.Point(i[0], i[1]) for i in a_list]
-    polygon = arcpy.Polygon(arcpy.Array(point_obj))
-    return polygon
-
+# 重要参数和属性
 
 cfm = arcpy.CreateFeatureclass_management
 shpfile = cfm(ws, "PentagonTile", "polygon", spatial_reference=sr)
 
-# 循环创建20次
-loop = int(lyr_h/(6*leng))
-array_pt = []
-for i in xrange(loop*2):
-    new_pts = [(_[0] - length * 3 / 2 * 1 * i, _[1] + 5 * leng * 1 * i) for _ in pts]
+# 左上方向的偏移距离
+offset_x = -length * 3/2
+offset_y =  5 * leng
+# 右下方向的偏移距离
+offset_x2 = length*4.5
+offset_y2 = -leng
+
+
+
+# y轴方向循环次数
+loop_y = int(lyr_h/(6*leng))
+array_pt = [] # 用于存放一整列的五边形
+for i in xrange(int(loop_y*1.6)):
+    # 向上偏移距离
+    # new_pts = [(_[0] - length * 3 / 2 * i, _[1] + 5 * leng * i) for _ in pts]
+    new_pts = [(_[0]+offset_x*i, _[1]+offset_y*i) for _ in pts]
 
     A = new_pts[:5]
     B = new_pts[4:6] + [new_pts[11], new_pts[10], new_pts[0]]
@@ -135,26 +189,17 @@ for i in xrange(loop*2):
     array_pt.append(E)
     array_pt.append(F)
 
-
-
-"""--------构建要素------"""
-"""---------------------"""
-
 np_array = np.array(array_pt)
 print "Len:{}".format(len(np_array)) # 396
 print "Size:{}".format(np_array.size)
 print "Shape:{}".format(np_array.shape)
 print "Ndim:{}".format(np_array.ndim)
-# pprint(np_array)
-offset_x2 = -length*4.5
-offset_y2 = -leng
-np_array = np_array-(offset_x2,offset_y2)
+    
+loop_x = int(lyr_w/(4*length))
+for _ in xrange(int(loop_x*1.4)):
+    tile_creator(np_array, shpfile)
+    np_array = np_array+(offset_x2, offset_y2)
 
-loop = int(lyr_w/(4*length))
-for i in xrange(loop*2):
-    rows = arcpy.da.InsertCursor(shpfile, "SHAPE@")
-    for ii in np_array:
-        pprint(ii)
-        # 不需要转换了，支持np.array格式
-        # poly = conver_point2Polgon(ii)
-        rows.insertRow([ii])
+"""--------构建要素------"""
+"""--------------------------------------"""
+    
