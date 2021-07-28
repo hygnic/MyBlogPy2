@@ -71,6 +71,8 @@ def tile_creator(array_obj, featurecalss):
 """--------------------------------------"""
 
 
+
+
 """--------------------------------------"""
 """--------基本属性------"""
 
@@ -79,9 +81,23 @@ arcpy.env.workspace = ws
 arcpy.env.overwriteOutput = True
 
 
+"""--------工具箱接口------"""
+"""--------工具箱接口------"""
+fc = arcpy.GetParameterAsText(0) # featureclass
+output_fc = arcpy.GetParameterAsText(1) # featureclass
+side_length = int(arcpy.GetParameterAsText(2))
+num = int(arcpy.GetParameterAsText(3)) # x,y轴扩展倍数
+
+ws = os.path.dirname(output_fc)
+fc_name = os.path.basename(output_fc)
+# arcpy.env.scratchWorkspace = ws
+"""--------工具箱接口------"""
+"""--------工具箱接口------"""
+
+
 # 坐标原点
-# lyr_o, lyr_w, lyr_h, sr=check_extent("data/grid.shp")
-lyr_o, lyr_w, lyr_h, sr=check_extent("tiff.tif")
+# lyr_o, lyr_w, lyr_h, sr=check_extent("tiff.tif")
+lyr_o, lyr_w, lyr_h, sr=check_extent(fc)
 print "featureclass width:{}".format(lyr_w)
 print "featureclass height:{}".format(lyr_h)
 origin = lyr_o
@@ -90,16 +106,22 @@ oY = origin[1]
 print "origin X:{}".format(oX)
 print "origin Y:{}".format(oY)
 # 五边形短边长度
-length = 300
+# length = 300
+length = side_length
 # 角度
 angle01 = 60
 
 # 垂直距离
 leng = length * sin(radians(angle01))  # 300*sin60°
 
+
+
+cfm = arcpy.CreateFeatureclass_management
+# shpfile = cfm(ws, "PentagonTile", "polygon", spatial_reference=sr)
+shpfile = cfm(ws, fc_name, "polygon", spatial_reference=sr)
+
 """--------基本属性------"""
 """--------------------------------------"""
-
 
 
 
@@ -115,6 +137,7 @@ pte = (oX + length / 2, oY + leng * 3)
 quadrant1 = [origin, pta, ptb, ptc, ptd, pte]
 
 # 二象限
+
 pta2 = (oX - length * 2, pta[1])
 ptb2 = (pta2[0] - length / 2, ptb[1])
 ptc2 = (pta2[0], ptc[1])
@@ -123,6 +146,7 @@ pte2 = (oX - length / 2, pte[1])
 quadrant2 = [origin, pta2, ptb2, ptc2, ptd2, pte2]
 
 # 三象限
+
 ptb3 = (ptb2[0], oY - leng)
 ptc3 = (ptc2[0], oY - leng * 2)
 ptd3 = (ptd2[0], ptc3[1])
@@ -130,6 +154,7 @@ pte3 = (pte2[0], oY - leng * 3)
 quadrant3 = [origin, pta2, ptb3, ptc3, ptd3, pte3]
 
 # 四象限
+
 ptb4 = (pta[0] + length / 2, oY - leng)
 ptc4 = (pta[0], oY - leng * 2)
 ptd4 = (oX + length, ptc4[1])
@@ -157,15 +182,15 @@ pts = [origin, pta, ptb, ptc, ptd, pte,
 
 """--------------------------------------"""
 """--------构建要素------"""
-# 重要参数和属性
 
-cfm = arcpy.CreateFeatureclass_management
-shpfile = cfm(ws, "PentagonTile", "polygon", spatial_reference=sr)
 
 # 左上方向的偏移距离
+
 offset_x = -length * 3/2
 offset_y =  5 * leng
+
 # 右下方向的偏移距离
+
 offset_x2 = length*4.5
 offset_y2 = -leng
 
@@ -178,9 +203,11 @@ offset_y2 = -leng
 # print distance
 
 # y轴方向循环次数
+
 loop_y = int(lyr_h/(6*leng))
 array_pt = [] # 用于存放一整列的五边形
-for i in xrange(int(loop_y*1.6)):
+# for i in xrange(int(loop_y*1.6)):
+for i in xrange(int(loop_y*num)):
     # 向上偏移距离
     # new_pts = [(_[0] - length * 3 / 2 * i, _[1] + 5 * leng * i) for _ in pts]
     new_pts = [(_[0]+offset_x*i, _[1]+offset_y*i) for _ in pts]
@@ -205,7 +232,8 @@ print "Shape:{}".format(np_array.shape)
 print "Ndim:{}".format(np_array.ndim)
 
 loop_x = int(lyr_w/(4*length))
-for _ in xrange(int(loop_x*1.4)):
+# for _ in xrange(int(loop_x*1.4)):
+for _ in xrange(int(loop_x*num)):
     tile_creator(np_array, shpfile)
     np_array = np_array+(offset_x2, offset_y2)
 
