@@ -83,7 +83,7 @@ arcpy.env.overwriteOutput = True
 
 """--------工具箱接口------"""
 """--------工具箱接口------"""
-fc = arcpy.GetParameterAsText(0) # featureclass
+input_fc = arcpy.GetParameterAsText(0) # featureclass
 output_fc = arcpy.GetParameterAsText(1) # featureclass
 side_length = int(arcpy.GetParameterAsText(2))
 num = int(arcpy.GetParameterAsText(3)) # x,y轴扩展倍数
@@ -97,7 +97,7 @@ fc_name = os.path.basename(output_fc)
 
 # 坐标原点
 # lyr_o, lyr_w, lyr_h, sr=check_extent("tiff.tif")
-lyr_o, lyr_w, lyr_h, sr=check_extent(fc)
+lyr_o, lyr_w, lyr_h, sr=check_extent(input_fc)
 print "featureclass width:{}".format(lyr_w)
 print "featureclass height:{}".format(lyr_h)
 origin = lyr_o
@@ -118,7 +118,7 @@ leng = length * sin(radians(angle01))  # 300*sin60°
 
 cfm = arcpy.CreateFeatureclass_management
 # shpfile = cfm(ws, "PentagonTile", "polygon", spatial_reference=sr)
-shpfile = cfm(ws, fc_name, "polygon", spatial_reference=sr)
+shpfile = cfm(ws, fc_name+"0012701", "polygon", spatial_reference=sr)
 
 """--------基本属性------"""
 """--------------------------------------"""
@@ -239,4 +239,20 @@ for _ in xrange(int(loop_x*num)):
 
 """--------构建要素------"""
 """--------------------------------------"""
-    
+
+
+"""--------------------------------------"""
+"""--------删除范围外的要素------"""
+
+feature_layer = "f_layer"
+arcpy.MakeFeatureLayer_management(shpfile, feature_layer)
+
+arcpy.SelectLayerByLocation_management(feature_layer,
+                                       "INTERSECT", input_fc)
+# selection_type="SWITCH_SELECTION"
+# arcpy.DeleteFeatures_management(feature_layer)
+arcpy.CopyFeatures_management(feature_layer, output_fc)
+arcpy.Delete_management(shpfile)
+
+"""--------删除范围外的要素------"""
+"""--------------------------------------"""

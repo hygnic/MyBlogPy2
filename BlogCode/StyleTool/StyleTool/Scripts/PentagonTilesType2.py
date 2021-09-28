@@ -66,7 +66,7 @@ def tile_creator(array_obj, featurecalss):
 
 """--------工具箱接口------"""
 """--------工具箱接口------"""
-fc = arcpy.GetParameterAsText(0) # featureclass
+input_fc = arcpy.GetParameterAsText(0) # featureclass
 output_fc = arcpy.GetParameterAsText(1) # featureclass
 side_length = int(arcpy.GetParameterAsText(2))
 long_side_length = int(arcpy.GetParameterAsText(3))
@@ -85,7 +85,7 @@ arcpy.env.overwriteOutput = True
 
 # 坐标原点
 # lyr_o, lyr_w, lyr_h, sr=check_extent("data/grid.shp")
-lyr_o, lyr_w, lyr_h, sr=check_extent(fc)
+lyr_o, lyr_w, lyr_h, sr=check_extent(input_fc)
 print "featureclass width:{}".format(lyr_w)
 print "featureclass ht:{}".format(lyr_h)
 origin = lyr_o
@@ -108,7 +108,7 @@ leng = length * sin(radians(angle01))*2
 ht = long_side_length
 cfm = arcpy.CreateFeatureclass_management
 # shpfile = cfm(ws, "PentagonTile2", "polygon", spatial_reference=sr)
-shpfile = cfm(ws, fc_name, "polygon", spatial_reference=sr)
+shpfile = cfm(ws, fc_name+"012047", "polygon", spatial_reference=sr)
 
 """--------基本属性------"""
 """--------------------------------------"""
@@ -193,4 +193,21 @@ for _ in xrange(int(loop_x*num)):
     np_array = np_array+(offset_x2, offset_y2)
 
 """--------构建要素------"""
+"""--------------------------------------"""
+
+
+"""--------------------------------------"""
+"""--------删除范围外的要素------"""
+
+feature_layer = "f_layer"
+arcpy.MakeFeatureLayer_management(shpfile, feature_layer)
+
+arcpy.SelectLayerByLocation_management(feature_layer,
+                                       "INTERSECT", input_fc)
+# selection_type="SWITCH_SELECTION"
+# arcpy.DeleteFeatures_management(feature_layer)
+arcpy.CopyFeatures_management(feature_layer, output_fc)
+arcpy.Delete_management(shpfile)
+
+"""--------删除范围外的要素------"""
 """--------------------------------------"""
