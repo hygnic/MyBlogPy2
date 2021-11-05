@@ -110,7 +110,7 @@ def points_genarator(txt_file):
 			row_num = re.findall(r'[0-9]+|[a-z]+', row1[0])  # ['1']
 			# 解决了文本最后有空行会报错的问题
 			if row1 == [""] or row1 == [" "]:
-				print u"&<{}> 存在空行 \n 已解决\n&".format(txt_file)
+				# print u"&<{}> 存在空行 \n 已解决\n&".format(txt_file)
 				continue
 			row_num2 = row1[1]
 			if not line_closed:  # 为空时
@@ -196,8 +196,8 @@ def main(info, txt_folder, output_folder):
 			
 			Rows.insertRow([p])
 			del Rows
-			output_info = "--Export succeed:{}--".format(os.path.join(
-				output_folder, name))
+			output_info = "--Export succeed: " + os.path.join(
+				output_folder, name)
 			print output_info
 			info.append(output_info)
 			
