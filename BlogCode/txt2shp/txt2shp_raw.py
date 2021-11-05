@@ -197,7 +197,7 @@ def main(info, txt_folder, output_folder):
 			Rows.insertRow([p])
 			del Rows
 			output_info = "--Export succeed: " + os.path.join(
-				output_folder, name)
+				output_folder, name).encode("utf8")
 			print output_info
 			info.append(output_info)
 			
