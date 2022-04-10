@@ -6,7 +6,7 @@
 # Version:           
 # Reference:         
 """
-Description:         <<整体轮廓线>>
+Description:         <<整体轮廓>>
 Usage:               
 """
 # -------------------------------------------
@@ -16,35 +16,7 @@ import sys
 from random import randint
 
 
-#------------------------------
-#------------path--------------
-#       在导入的情况下
-# arcpy.AddMessage("CURRENT: {}".format(os.getcwd()))
-# CURRENT: C:\Windows\system32
 
-# 返回工具箱的完整名称
-toolbox = os.path.abspath(sys.argv[0])
-# arcpy.AddMessage(toolbox)
-
-tool_dir = os.path.abspath(os.path.dirname(toolbox))
-# lyr
-dir_lyr = os.path.join(tool_dir, "lyr") # StyleTool/lyr
-# 制图表达相关
-representation = os.path.join(tool_dir, "Representation")
-rp_gdb = os.path.join(representation, "rep_base.gdb")
-#------------path--------------
-#------------------------------
-
-#------------------------------
-#----------workspace-----------
-os.chdir(tool_dir)
-gdb = "workspace.gdb"
-if not arcpy.Exists(gdb):
-    arcpy.CreateFileGDB_management(os.getcwd(), gdb)
-arcpy.env.workspace = os.path.abspath(gdb)
-work = arcpy.env.workspace
-#----------workspace-----------
-#------------------------------
 
 
 
@@ -133,8 +105,31 @@ def better_contour(inputclass, outputclass):
     print("complete")
     arcpy.Delete_management(after_eli)
 
+
 if __name__ == '__main__':
+    #------------------------------
+    #------------path--------------
+    #       在导入的情况下
+    # arcpy.AddMessage("CURRENT: {}".format(os.getcwd()))
+    # CURRENT: C:\Windows\system32
+    
+    # 返回工具箱的完整名称
+    toolbox = os.path.abspath(sys.argv[0])
+    tool_dir = os.path.abspath(os.path.dirname(toolbox))
+    # lyr
+    dir_lyr = os.path.join(tool_dir, "lyr") # StyleTool/lyr
+    #------------path--------------
+    #------------------------------
+    
+    #------------------------------
+    #----------workspace-----------
     arcpy.env.overwriteOutput = True
+    arcpy.env.workspace = os.path.dirname(arcpy.GetParameterAsText(1))
+    work = arcpy.env.workspace
+    #----------workspace-----------
+    #------------------------------
+    
+    
 
     #-----------name----------------
     # 将所有输入的图层合并
@@ -143,8 +138,7 @@ if __name__ == '__main__':
 
     
     # better_contour([ur"G:\MoveOn\mapping\v103\base.gdb\GBZ"], "new_contour_line")
-    output = "output_{}".format(randint(0, 10000))
     shps = arcpy.GetParameterAsText(0).split(";")
-    better_contour(shps, output)
+    better_contour(shps, arcpy.GetParameterAsText(1))
     # arcpy.AddMessage(s)
     # arcpy.AddMessage(type(s))

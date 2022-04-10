@@ -7,7 +7,7 @@
 # Reference:         
 """
 Description:         制图表达相关的
-已经导入工具箱 <<均匀渐变_黑色>>
+已经导入工具箱 <<渐变轮廓 黑>>
 Usage:
 """
 # -------------------------------------------
@@ -17,42 +17,12 @@ import sys
 from random import randint
 
 
-#------------------------------
-#------------path--------------
-#       在导入的情况下
-arcpy.AddMessage("CURRENT: {}".format(os.getcwd()))
-# CURRENT: C:\Windows\system32
-
-# 返回工具箱的完整名称
-toolbox = os.path.abspath(sys.argv[0])
-arcpy.AddMessage(toolbox)
-
-tool_dir = os.path.abspath(os.path.dirname(toolbox))
-# lyr
-dir_lyr = os.path.join(tool_dir, "lyr") # StyleTool/lyr
-# 制图表达相关
-representation = os.path.join(tool_dir, "Representation")
-rp_gdb = os.path.join(representation, "rep_base.gdb")
-#------------path--------------
-#------------------------------
-
-#------------------------------
-#----------workspace-----------
-os.chdir(tool_dir)
-gdb = "workspace.gdb"
-if not arcpy.Exists(gdb):
-    arcpy.CreateFileGDB_management(os.getcwd(), gdb)
-arcpy.env.workspace = os.path.abspath(gdb)
-work = arcpy.env.workspace
-#----------workspace-----------
-#------------------------------
-
-
-def update_representation(inputfile, rep_lyr):
+def update_representation(inputfile, rep_lyr, output):
     """
     给图层添加指定的制图表达效果并添加到 ArcMap 中
     :param inputfile: 输入图层
     :param rep_lyr: {String} 制图表达图层名称（.lyr file）
+    :param output: 样式输出图层
     :return:
     """
     #       check
@@ -62,23 +32,22 @@ def update_representation(inputfile, rep_lyr):
     
     #       mxd file obj
     arcpy.env.overwriteOutput = True
-    randnum = randint(0, 999999)
     mxd = arcpy.mapping.MapDocument("CURRENT")
     df = arcpy.mapping.ListDataFrames(mxd)[0]
     
     #       create a new layer
     in_lyr = arcpy.mapping.Layer(inputfile)
     # layer name
-    new_n = "{}_{}".format("gradient", randnum)
-    arcpy.CopyFeatures_management(inputfile, new_n)
+    arcpy.CopyFeatures_management(inputfile, output)
     # arcpy.AddMessage(type(new_n)) # <'str'>
     # new_lyr = arcpy.mapping.Layer(new_n)
-    new_lyr = arcpy.mapping.Layer(os.path.join(work, new_n))
+    new_lyr = arcpy.mapping.Layer(os.path.join(work, output))
 
     #       make representation symbol to new layer
     representation_lyr = arcpy.mapping.Layer(rep_lyr)
     arcpy.AddMessage("------------------")
     # representation name
+    randnum = randint(0, 999999)
     rp_name = "Rep_{}".format(randnum)
     # 创建制图表达
     r_func = arcpy.AddRepresentation_cartography
@@ -90,13 +59,35 @@ def update_representation(inputfile, rep_lyr):
     
     #       add new layer to arcmap
     arcpy.SetLayerRepresentation_cartography(new_lyr, rp_name)
-    arcpy.AddMessage("Output Feature: {}".format(os.path.join(work, new_n).encode("utf8")))
     arcpy.mapping.AddLayer(df, new_lyr)
     arcpy.AddMessage("\n------------------")
 
     
 if __name__ == '__main__':
     
+    #------------------------------
+    #------------path--------------
+    # 返回工具箱的完整名称
+    toolbox = os.path.abspath(sys.argv[0])
+    arcpy.AddMessage(toolbox)
+    
+    tool_dir = os.path.abspath(os.path.dirname(toolbox))
+    # lyr
+    dir_lyr = os.path.join(tool_dir, "lyr") # StyleTool/lyr
+    # 制图表达相关
+    representation = os.path.join(tool_dir, "Representation")
+    rp_gdb = os.path.join(representation, "rep_base.gdb")
+    #------------path--------------
+    #------------------------------
+    
+    #------------------------------
+    #----------workspace-----------
+    arcpy.env.workspace = os.path.dirname(arcpy.GetParameterAsText(1))
+    work = arcpy.env.workspace
+    #----------workspace-----------
+    #------------------------------
+    
     # rep_lyrr = os.path.join(representation, "BlueGradient.lyr")
     rep_lyrr = os.path.join(representation, "BlackGradient.lyr")
-    update_representation(arcpy.GetParameterAsText(0), rep_lyrr)
+    update_representation(arcpy.GetParameterAsText(0), rep_lyrr,
+                          arcpy.GetParameterAsText(1))

@@ -6,7 +6,7 @@
 # Version:           
 # Reference:         
 """
-Description:         <<内部渐变_偏移>> 制图表达效果-复合工具
+Description:         <<复合 渐变偏移>> 制图表达效果-复合工具
 Usage:               
 """
 # -------------------------------------------
@@ -16,38 +16,8 @@ import sys
 from random import randint
 
 
-#------------------------------
-#------------path--------------
-#       在导入的情况下
-arcpy.AddMessage("CURRENT: {}".format(os.getcwd()))
-# CURRENT: C:\Windows\system32
 
-# 返回工具箱的完整名称
-toolbox = os.path.abspath(sys.argv[0])
-arcpy.AddMessage(toolbox)
-
-tool_dir = os.path.abspath(os.path.dirname(toolbox))
-# lyr
-dir_lyr = os.path.join(tool_dir, "lyr") # StyleTool/lyr
-# 制图表达相关
-representation = os.path.join(tool_dir, "Representation")
-rp_gdb = os.path.join(representation, "rep_base.gdb")
-#------------path--------------
-#------------------------------
-
-#------------------------------
-#----------workspace-----------
-os.chdir(tool_dir)
-gdb = "workspace.gdb"
-if not arcpy.Exists(gdb):
-    arcpy.CreateFileGDB_management(os.getcwd(), gdb)
-arcpy.env.workspace = os.path.abspath(gdb)
-work = arcpy.env.workspace
-#----------workspace-----------
-#------------------------------
-
-
-def update_representation(inputfile, rep_lyr):
+def update_representation(inputfile, rep_lyr, output):
     """
     给图层添加指定的制图表达效果并添加到 ArcMap 中
     :param inputfile: 输入图层
@@ -68,11 +38,10 @@ def update_representation(inputfile, rep_lyr):
     #       create a new layer
     in_lyr = arcpy.mapping.Layer(inputfile)
     # layer name
-    new_n = "{}_{}".format("IGM", randnum)
-    arcpy.CopyFeatures_management(inputfile, new_n)
+    arcpy.CopyFeatures_management(inputfile, output)
     # arcpy.AddMessage(type(new_n)) # <'str'>
     # new_lyr = arcpy.mapping.Layer(new_n)
-    new_lyr = arcpy.mapping.Layer(os.path.join(work, new_n))
+    new_lyr = arcpy.mapping.Layer(os.path.join(work, output))
     
     #       make representation symbol to new layer
     representation_lyr = arcpy.mapping.Layer(rep_lyr)
@@ -95,5 +64,33 @@ def update_representation(inputfile, rep_lyr):
 
 
 if __name__ == '__main__':
+
+    #------------------------------
+    #------------path--------------
+    #       在导入的情况下
+    arcpy.AddMessage("CURRENT: {}".format(os.getcwd()))
+    # CURRENT: C:\Windows\system32
+    
+    # 返回工具箱的完整名称
+    toolbox = os.path.abspath(sys.argv[0])
+    arcpy.AddMessage(toolbox)
+    
+    tool_dir = os.path.abspath(os.path.dirname(toolbox))
+    # lyr
+    dir_lyr = os.path.join(tool_dir, "lyr") # StyleTool/lyr
+    # 制图表达相关
+    representation = os.path.join(tool_dir, "Representation")
+    rp_gdb = os.path.join(representation, "rep_base.gdb")
+    #------------path--------------
+    #------------------------------
+    
+    #------------------------------
+    #----------workspace-----------
+    arcpy.env.workspace = os.path.dirname(arcpy.GetParameterAsText(1))
+    work = arcpy.env.workspace
+    #----------workspace-----------
+    #------------------------------
+    
     rep_lyrr = os.path.join(representation, "innergradient_move.lyr")
-    update_representation(arcpy.GetParameterAsText(0), rep_lyrr)
+    update_representation(arcpy.GetParameterAsText(0), rep_lyrr,
+                          arcpy.GetParameterAsText(1))

@@ -15,63 +15,53 @@ import os
 import sys
 from random import randint
 
-
-#------------------------------
-#------------path--------------
+# ------------------------------
+# ------------path--------------
 #       在导入的情况下
 arcpy.AddMessage("CURRENT: {}".format(os.getcwd()))
 # CURRENT: C:\Windows\system32
 
-# 返回工具箱的完整名称
+# 返回工具箱地址
 toolbox = os.path.abspath(sys.argv[0])
-arcpy.AddMessage(toolbox)
-
 tool_dir = os.path.abspath(os.path.dirname(toolbox))
 # lyr
-dir_lyr = os.path.join(tool_dir, "lyr") # StyleTool/lyr
+dir_lyr = os.path.join(tool_dir, "lyr")
 # 制图表达相关
 representation = os.path.join(tool_dir, "Representation")
 rp_gdb = os.path.join(representation, "rep_base.gdb")
-#------------path--------------
-#------------------------------
+# ------------path--------------
+# ------------------------------
 
-#------------------------------
-#----------workspace-----------
-os.chdir(tool_dir)
-gdb = "workspace.gdb"
-if not arcpy.Exists(gdb):
-    arcpy.CreateFileGDB_management(os.getcwd(), gdb)
-arcpy.env.workspace = os.path.abspath(gdb)
-work = arcpy.env.workspace
-#----------workspace-----------
-#------------------------------
 
-def update_representation(inputfile, rep_lyr, opacity):
+def update_representation(inputfile, rep_lyr, outputfile, opacity):
     """
     给图层添加指定的制图表达效果并添加到 ArcMap 中
     :param inputfile: 输入图层
+    :param outputfile: 结果输出
     :param rep_lyr: {String} 制图表达图层名称（.lyr file）
+    :param opacity: 透明度设置
     :return:
     """
-    #       check
+    
+    # workspace
+    arcpy.env.workspace = os.path.dirname(outputfile)
+    work = arcpy.env.workspace
+    #   check
     if not arcpy.Exists(rep_lyr):
         raise RuntimeError("Representation lyr file not exist.")
     
-    
-    #       mxd file obj
+    # mxd file obj
     arcpy.env.overwriteOutput = True
     randnum = randint(0, 999999)
     mxd = arcpy.mapping.MapDocument("CURRENT")
     df = arcpy.mapping.ListDataFrames(mxd)[0]
     
-    #       create a new layer
+    # create a new layer
     in_lyr = arcpy.mapping.Layer(inputfile)
     # layer name
     new_n = "{}_{}".format("building", randnum)
-    arcpy.CopyFeatures_management(inputfile, new_n)
-    # arcpy.AddMessage(type(new_n)) # <'str'>
-    # new_lyr = arcpy.mapping.Layer(new_n)
-    new_lyr = arcpy.mapping.Layer(os.path.join(work, new_n))
+    arcpy.CopyFeatures_management(inputfile, outputfile)
+    new_lyr = arcpy.mapping.Layer(os.path.join(work, outputfile))
     
     #       make representation symbol to new layer
     representation_lyr = arcpy.mapping.Layer(rep_lyr)
@@ -93,4 +83,5 @@ def update_representation(inputfile, rep_lyr, opacity):
 if __name__ == '__main__':
     rep_lyrr = os.path.join(representation, "buildingshadow.lyr")
     update_representation(arcpy.GetParameterAsText(0), rep_lyrr,
+                          arcpy.GetParameterAsText(2),
                           arcpy.GetParameterAsText(1))

@@ -17,50 +17,26 @@ import os
 import sys
 
 
-#------------------------------
-#------------path--------------
-#       在导入的情况下
-# arcpy.AddMessage("CURRENT: {}".format(os.getcwd()))
-# CURRENT: C:\Windows\system32
-
-# 返回工具箱的完整名称
-toolbox = os.path.abspath(sys.argv[0])
-arcpy.AddMessage(toolbox)
-
-tool_dir = os.path.abspath(os.path.dirname(toolbox))
-# lyr
-dir_lyr = os.path.join(tool_dir, "lyr") # StyleTool/lyr
-# 制图表达相关
-representation = os.path.join(tool_dir, "Representation")
-rp_gdb = os.path.join(representation, "rep_base.gdb")
-#------------path--------------
-#------------------------------
-
-#------------------------------
-#----------workspace-----------
-os.chdir(tool_dir)
-gdb = "workspace.gdb"
-if not arcpy.Exists(gdb):
-    arcpy.CreateFileGDB_management(os.getcwd(), gdb)
-arcpy.env.workspace = os.path.abspath(gdb)
-work = arcpy.env.workspace
-#----------workspace-----------
-#------------------------------
-
-
 
 class OpacityContour(object):
     # 创建透明渐变的外边缘。
     # 1.先创建9层缓冲区
     # 2.新建字段用于存放不同级别缓冲区的透明度
     
-    def __init__(self, in_f, times, lyr):
+    def __init__(self, in_f, times, lyr, output):
+        """
+        :param in_f: 输入要素范围
+        :param times: 放大倍数
+        :param lyr: lyr 效果图层
+        :param output: 样式图层输出
+        """
         self.mxd = arcpy.mapping.MapDocument("CURRENT")
         self.df = arcpy.mapping.ListDataFrames(self.mxd)[0]
         
         self.in_f = in_f
         self.times = times
         self.lyr = arcpy.mapping.Layer(lyr)
+        self.output = output
         
         self.distance = [i*10 for i in xrange(1, 10)]
         
@@ -71,11 +47,10 @@ class OpacityContour(object):
         num = int(self.times)
         inputfile = self.in_f
         distance = [_*num for _ in self.distance]
-        name = arcpy.CreateScratchName("opacitybuffer", data_type="FeatureClass", workspace = work)
-        arcpy.MultipleRingBuffer_analysis(inputfile, name, distance, "Meters", Outside_Polygons_Only=True)
+        arcpy.MultipleRingBuffer_analysis(inputfile, self.output, distance, "Meters", Outside_Polygons_Only=True)
         
         # set symbol and add layer to ArcMap
-        self.res_lyr = arcpy.mapping.Layer(name)
+        self.res_lyr = arcpy.mapping.Layer(self.output)
         # self.res_lyr = arcpy.mapping.Layer(inputfile)
         
         
@@ -143,7 +118,34 @@ class OpacityContour(object):
     
 
 if __name__ == '__main__':
-    # arcpy.env.addOutputsToMap = True
+    #------------------------------
+    #------------path--------------
+    #       在导入的情况下
+    # arcpy.AddMessage("CURRENT: {}".format(os.getcwd()))
+    # CURRENT: C:\Windows\system32
+    
+    # 返回工具箱的完整名称
+    toolbox = os.path.abspath(sys.argv[0])
+    tool_dir = os.path.abspath(os.path.dirname(toolbox))
+    # lyr
+    dir_lyr = os.path.join(tool_dir, "lyr") # StyleTool/lyr
+    # 制图表达文件存储位置
+    representation = os.path.join(tool_dir, "Representation")
+    rp_gdb = os.path.join(representation, "rep_base.gdb")
+    #------------path--------------
+    #------------------------------
+    
+    #------------------------------
+    #----------workspace-----------
+    arcpy.env.workspace = os.path.dirname(arcpy.GetParameterAsText(2))
+    work = arcpy.env.workspace
+    #----------workspace-----------
+#------------------------------
+
+
+
+# arcpy.env.addOutputsToMap = True
     lyr_file = os.path.join(dir_lyr, "opacity.lyr")
     OpacityContour(arcpy.GetParameterAsText(0),
-                     arcpy.GetParameterAsText(1), lyr_file)
+                   arcpy.GetParameterAsText(1), lyr_file,
+                   arcpy.GetParameterAsText(2))
