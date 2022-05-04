@@ -20,7 +20,7 @@ def multip_direction_hillshade(raster_layer, z_factor, altitude, output):
     # To allow overwriting outputs change overwriteOutput option to True.
     arcpy.env.overwriteOutput = True
 
-    z_factor = int(z_factor)
+    z_factor = float(z_factor)
     altitude = int(altitude)
 
     # Process: Hillshade (Hillshade) (sa)
