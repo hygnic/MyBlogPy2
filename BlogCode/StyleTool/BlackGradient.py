@@ -64,7 +64,6 @@ def update_representation(inputfile, rep_lyr, output):
 
     
 if __name__ == '__main__':
-    
     #------------------------------
     #------------path--------------
     # 返回工具箱的完整名称
