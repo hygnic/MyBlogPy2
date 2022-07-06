@@ -6,7 +6,7 @@
 # Version:           
 # Reference:
 """
-Description:         立体边界效果>>线图层、制图表达效果、偏移切线
+Description:         立体边界效果>>面图层转换为线图层、制图表达效果、偏移切线
 Usage:               
 """
 # -------------------------------------------
@@ -24,42 +24,63 @@ def update_representation(inputfile, rep_lyr, output):
     :param output: 样式输出图层
     :return:
     """
-    #       check
+    # check
     if not arcpy.Exists(rep_lyr):
         raise RuntimeError("Representation lyr file not exist.")
     
-    
-    #       mxd file obj
+    ####### mxd file obj
     arcpy.env.overwriteOutput = True
     mxd = arcpy.mapping.MapDocument("CURRENT")
     df = arcpy.mapping.ListDataFrames(mxd)[0]
     
-    #       create a new layer
+    ###### Change polygon to line
     in_lyr = arcpy.mapping.Layer(inputfile)
-    # layer name
-    arcpy.CopyFeatures_management(inputfile, output)
-    # arcpy.AddMessage(type(new_n)) # <'str'>
-    # new_lyr = arcpy.mapping.Layer(new_n)
+    randnum = randint(0, 999999)
+    lyr_randname = "%scratchGDB%/lyr_{}".format(randnum)
+    arcpy.FeatureToLine_management(in_lyr, lyr_randname)
+    
+    ####### Create a new layer
+    arcpy.CopyFeatures_management(lyr_randname, output)
     new_lyr = arcpy.mapping.Layer(os.path.join(work, output))
     
-    #       make representation symbol to new layer
+    ####### Make representation symbol to new layer
     representation_lyr = arcpy.mapping.Layer(rep_lyr)
     arcpy.AddMessage("------------------")
     # representation name
     randnum = randint(0, 999999)
     rp_name = "Rep_{}".format(randnum)
-    # 创建制图表达
+    
+    ####### Create Representation
     r_func = arcpy.AddRepresentation_cartography
     r_func(new_lyr, rp_name, import_rule_layer=representation_lyr)
     
-    #       copy transparency value
+    ###### copy transparency value
     opacity = representation_lyr.transparency
     new_lyr.transparency = opacity
     
     #       add new layer to arcmap
     arcpy.SetLayerRepresentation_cartography(new_lyr, rp_name)
     arcpy.mapping.AddLayer(df, new_lyr)
+    arcpy.Delete_management(lyr_randname)
+    
     arcpy.AddMessage("\n------------------")
+
+
+def add_background_layer(path_gdb, output):
+    """
+    :param path_gdb:
+    :param output: 使用工具的輸出路勁文件夾
+    :return:
+    """
+    ##### Add backgroud layer and erase
+    retangle_world = os.path.join(path_gdb, "FeatureClass_RetangleWorld3857")
+    retangle_world = arcpy.mapping.Layer(retangle_world)
+    
+    randnum = randint(0, 999)
+    lyr_name = os.path.join(os.path.dirname(output), "Background{}".format(randnum))
+    arcpy.Erase_analysis(retangle_world, lyr_name)
+    
+    ##### 應用 lyr 樣式並添加圖層到 mxd 中
 
 
 if __name__ == '__main__':
@@ -68,8 +89,14 @@ if __name__ == '__main__':
     # 返回工具箱的完整名称
     toolbox = os.path.abspath(sys.argv[0])
     arcpy.AddMessage(toolbox)
-    # E:\Document\MoveOn\MyBlogPy2\BlogCode\StyleTool\SolidBoundaryLine.py
-    tool_dir = os.path.abspath(os.path.dirname(toolbox))
+    # E:\Document\MoveOn\MyBlogPy2\BlogCode\StyleToolCode\SolidBoundaryLine.py
+
+    #@@ 未导入工具箱中
+    
+    tool_dir = os.path.abspath(os.path.join(os.path.dirname(toolbox),"StyleTool"))
+    #@@ 运行于工具箱中
+    
+    # tool_dir = os.path.abspath(os.path.dirname(toolbox))
     # lyr
     dir_lyr = os.path.join(tool_dir, "lyr") # StyleTool/lyr
     # 制图表达相关
