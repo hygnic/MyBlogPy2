@@ -45,7 +45,7 @@ def update_representation(inputfile, rep_lyr, output):
 
     #       make representation symbol to new layer
     representation_lyr = arcpy.mapping.Layer(rep_lyr)
-    arcpy.AddMessage("------------------")
+    arcpy.AddMessage("\n------------------")
     # representation name
     randnum = randint(0, 999999)
     rp_name = "Rep_{}".format(randnum)
@@ -60,7 +60,8 @@ def update_representation(inputfile, rep_lyr, output):
     #       add new layer to arcmap
     arcpy.SetLayerRepresentation_cartography(new_lyr, rp_name)
     arcpy.mapping.AddLayer(df, new_lyr)
-    arcpy.AddMessage("\n------------------")
+    arcpy.AddMessage(new_lyr.dataSource)
+    arcpy.AddMessage("------------------\n")
 
     
 if __name__ == '__main__':

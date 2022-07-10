@@ -60,7 +60,7 @@ def update_representation(inputfile, rep_lyr, output):
     arcpy.SetLayerRepresentation_cartography(new_lyr, rp_name)
     arcpy.AddMessage(new_lyr.dataSource)
     arcpy.mapping.AddLayer(df, new_lyr)
-    arcpy.AddMessage("\n------------------")
+    arcpy.AddMessage("------------------\n")
 
 
 if __name__ == '__main__':

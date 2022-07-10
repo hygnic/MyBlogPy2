@@ -22,14 +22,14 @@ def two_direction_hillshade(raster_layer, z_factor, altitude, output, azimuth):
 
     z_factor = float(z_factor)
     altitude = int(altitude)
-    arcpy.AddMessage(azimuth)
-    arcpy.AddMessage(type(azimuth))
+    # arcpy.AddMessage(azimuth)
+    # arcpy.AddMessage(type(azimuth))
     if azimuth == u"true":
-        arcpy.AddMessage("first")
+        # arcpy.AddMessage("first")
         azimuth1 = 315
         azimuth2 = 90
     else:
-        arcpy.AddMessage("sec")
+        # arcpy.AddMessage("second")
         azimuth1 = 135
         azimuth2 = 180
         
