@@ -123,12 +123,12 @@ def add_background_layer(path_toolbox, input_fc, output, transparency):
                                   "rep_base.gdb",
                                   "FeatureClass_RetangleWorld3857")
     retangle_world = arcpy.mapping.Layer(retangle_world)
-
+    # Output background
     bg_lyr_name = arcpy.CreateScratchName(prefix="BgP", workspace=os.path.join(os.path.dirname(output)))
     arcpy.Erase_analysis(retangle_world, input_fc, bg_lyr_name)
-    bg_lyr_name_proj = arcpy.CreateScratchName(prefix="Bg", workspace=os.path.join(os.path.dirname(output)))
-    arcpy.Project_management(bg_lyr_name, bg_lyr_name_proj, input_fc)
-    bg_lyr = arcpy.mapping.Layer(bg_lyr_name_proj)
+    # bg_lyr_name_proj = arcpy.CreateScratchName(prefix="Bg", workspace=os.path.join(os.path.dirname(output)))
+    # arcpy.Project_management(bg_lyr_name, bg_lyr_name_proj, input_fc)
+    bg_lyr = arcpy.mapping.Layer(bg_lyr_name)
     
     ##### Update lyr file and add layer to mxd
     path_lyr_dir = os.path.join(path_toolbox, "lyr")
@@ -142,7 +142,6 @@ def add_background_layer(path_toolbox, input_fc, output, transparency):
     arcpy.mapping.UpdateLayer(df, bg_lyr, lyr_style)
     bg_lyr.transparency = int(transparency)
     arcpy.mapping.AddLayer(df, bg_lyr)
-    arcpy.Delete_management(bg_lyr_name)
     del mxd
     del df
 
