@@ -51,12 +51,12 @@ def merger_all(layer, outputclass= "in_memory/diss_all"):
     return outputclass
 
 
-def update_representation(inputfile, rep_lyr, output, border):
+def update_representation(inputfile, rep_lyr, output_re, border):
     """
     给图层添加指定的制图表达效果并添加到 ArcMap 中
     :param inputfile: 输入图层
     :param rep_lyr: {String} 制图表达图层名称（.lyr file）
-    :param output: 样式输出图层
+    :param output_re: 结果图层
     :param border: 布尔值 是否仅保留整体轮廓
     :return:
     """
@@ -78,11 +78,11 @@ def update_representation(inputfile, rep_lyr, output, border):
     
     randnum = randint(0, 999999)
     lyr_randname = "%scratchGDB%/lyr_{}".format(randnum)
-    arcpy.FeatureToLine_management(in_lyr, lyr_randname)
+    arcpy.FeatureToLine_management(inputfile, lyr_randname)
     
     ####### Create a new layer
-    arcpy.CopyFeatures_management(lyr_randname, output)
-    new_lyr = arcpy.mapping.Layer(os.path.join(work, output))
+    arcpy.CopyFeatures_management(lyr_randname, output_re)
+    new_lyr = arcpy.mapping.Layer(os.path.join(work, output_re))
     
     ####### Make representation symbol to new layer
     representation_lyr = arcpy.mapping.Layer(rep_lyr)
@@ -93,8 +93,7 @@ def update_representation(inputfile, rep_lyr, output, border):
     
     ####### Create Representation
     r_func = arcpy.AddRepresentation_cartography
-    r_func(new_lyr, rp_name, import_rule_layer=representation_lyr)
-    
+    r_func(new_lyr, rp_name, import_rule_layer=representation_lyr) #####
     ###### copy transparency value
     opacity = representation_lyr.transparency
     new_lyr.transparency = opacity
