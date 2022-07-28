@@ -1,12 +1,17 @@
-# -*- coding:utf-8 -*-
+# -*- coding:cp936 -*-
 # -------------------------------------------
+# Ê¹ÓÃ cp936 ±àÂë¿ÉÒÔ½â¾öÖĞÎÄµ¼Èë¹¤¾ßÏäÂÒÂëµÄÎÊÌâ
+# arcpy.AddMessage("\n|---------------------------------|")
+# arcpy.AddMessage(" -----  ¹¤¾ßÓÉ GISÜö ÖÆ×÷²¢·¢²¼  ------")
+# arcpy.AddMessage("|---------------------------------|\n")
+
 # Name:              SolidBoundaryLine
 # Author:            Hygnic
 # Created on:        2022/7/6 21:55
 # Version:           
 # Reference:
 """
-Description:         ç«‹ä½“è¾¹ç•Œæ•ˆæœ>>é¢å›¾å±‚è½¬æ¢ä¸ºçº¿å›¾å±‚ã€åˆ¶å›¾è¡¨è¾¾æ•ˆæœã€åç§»åˆ‡çº¿
+Description:         Á¢Ìå±ß½çĞ§¹û>>ÃæÍ¼²ã×ª»»ÎªÏßÍ¼²ã¡¢ÖÆÍ¼±í´ïĞ§¹û¡¢Æ«ÒÆÇĞÏß
 Usage:               
 """
 # -------------------------------------------
@@ -18,20 +23,20 @@ from random import randint
 
 def merger_all(layer, outputclass= "in_memory/diss_all"):
     """
-    ä¸€é”®å¿«é€Ÿåˆå¹¶ä¸€ä¸ªå›¾å±‚çš„æ‰€æœ‰è¦ç´ (æ·»åŠ ä¸€ä¸ªå­—æ®µï¼Œå…¨éƒ¨èµ‹å€¼ä¸º1ï¼Œç„¶åèåˆï¼Œæœ€ååˆ é™¤
-    è¯¥å­—æ®µ)
-        <ç‰¹åˆ«æ³¨æ„æ–°åˆæˆçš„å›¾å±‚åç§°ï¼Œæ˜¯å¦ä¼šè¦†ç›–>
-    layer(String): shpæˆ–è€…lyræ–‡ä»¶åœ°å€ï¼Œæˆ–è€…å›¾å±‚å¯¹è±¡
-    return: åˆå¹¶åçš„æ–°å›¾å±‚ é»˜è®¤è¿”å›å›¾å±‚åå­—ä¸º newlayer_945
+    Ò»¼ü¿ìËÙºÏ²¢Ò»¸öÍ¼²ãµÄËùÓĞÒªËØ(Ìí¼ÓÒ»¸ö×Ö¶Î£¬È«²¿¸³ÖµÎª1£¬È»ºóÈÚºÏ£¬×îºóÉ¾³ı
+    ¸Ã×Ö¶Î)
+        <ÌØ±ğ×¢ÒâĞÂºÏ³ÉµÄÍ¼²ãÃû³Æ£¬ÊÇ·ñ»á¸²¸Ç>
+    layer(String): shp»òÕßlyrÎÄ¼şµØÖ·£¬»òÕßÍ¼²ã¶ÔÏó
+    return: ºÏ²¢ºóµÄĞÂÍ¼²ã Ä¬ÈÏ·µ»ØÍ¼²ãÃû×ÖÎª newlayer_945
     """
     arcpy.env.addOutputsToMap = False
     arcpy.env.overwriteOutput = True
-    # åˆ¤æ–­æ˜¯å¦æœ‰è¿™ä¸ªå­—æ®µ
+    # ÅĞ¶ÏÊÇ·ñÓĞÕâ¸ö×Ö¶Î
     
     all_fields = arcpy.ListFields(layer)
     all_name = [i.name for i in all_fields]
     # for f in all_fields:
-    # 	print f.name #Todo  neme å’Œ aliasName è¿”å›çš„éƒ½ä¸€æ ·ï¼Œä¸ºä»€ä¹ˆ
+    # 	print f.name #Todo  neme ºÍ aliasName ·µ»ØµÄ¶¼Ò»Ñù£¬ÎªÊ²Ã´
     # print f.aliasName
     
     name = "test1f2lcc"
@@ -43,7 +48,7 @@ def merger_all(layer, outputclass= "in_memory/diss_all"):
         cursor.updateRow(row)
     del cursor
     # new_ly = "newlayer_945"
-    # ä½¿ç”¨å†…å­˜ç©ºé—´
+    # Ê¹ÓÃÄÚ´æ¿Õ¼ä
     
     new_ly = outputclass
     arcpy.Dissolve_management(layer, new_ly ,name)
@@ -53,11 +58,11 @@ def merger_all(layer, outputclass= "in_memory/diss_all"):
 
 def update_representation(inputfile, rep_lyr, output_re, border):
     """
-    ç»™å›¾å±‚æ·»åŠ æŒ‡å®šçš„åˆ¶å›¾è¡¨è¾¾æ•ˆæœå¹¶æ·»åŠ åˆ° ArcMap ä¸­
-    :param inputfile: è¾“å…¥å›¾å±‚
-    :param rep_lyr: {String} åˆ¶å›¾è¡¨è¾¾å›¾å±‚åç§°ï¼ˆ.lyr fileï¼‰
-    :param output_re: ç»“æœå›¾å±‚
-    :param border: å¸ƒå°”å€¼ æ˜¯å¦ä»…ä¿ç•™æ•´ä½“è½®å»“
+    ¸øÍ¼²ãÌí¼ÓÖ¸¶¨µÄÖÆÍ¼±í´ïĞ§¹û²¢Ìí¼Óµ½ ArcMap ÖĞ
+    :param inputfile: ÊäÈëÍ¼²ã
+    :param rep_lyr: {String} ÖÆÍ¼±í´ïÍ¼²ãÃû³Æ£¨.lyr file£©
+    :param output_re: ½á¹ûÍ¼²ã
+    :param border: ²¼¶ûÖµ ÊÇ·ñ½ö±£ÁôÕûÌåÂÖÀª
     :return:
     """
     # check
@@ -78,7 +83,7 @@ def update_representation(inputfile, rep_lyr, output_re, border):
     
     randnum = randint(0, 999999)
     lyr_randname = "%scratchGDB%/lyr_{}".format(randnum)
-    arcpy.FeatureToLine_management(inputfile, lyr_randname)
+    arcpy.FeatureToLine_management(in_lyr, lyr_randname)
     
     ####### Create a new layer
     arcpy.CopyFeatures_management(lyr_randname, output_re)
@@ -104,16 +109,16 @@ def update_representation(inputfile, rep_lyr, output_re, border):
     arcpy.Delete_management(lyr_randname)
     arcpy.Delete_management(in_lyr)
     arcpy.AddMessage(new_lyr.dataSource)
-    arcpy.AddMessage("------------------\n")
+    arcpy.AddMessage("------------------")
 
 
 def add_background_layer(path_toolbox, input_fc, output, transparency):
     """
-    æ·»åŠ èƒŒæ™¯å›¾å±‚
-    :param path_toolbox: å·¥å…·è·¯å¾„ï¼Œå¯è·å¾—lyrã€æ•°æ®åº“è·¯å¾„
-    :param input_fc: è¾“å…¥è¦ç´ ï¼Œç„¶åæ“¦é™¤
-    :param output: è¾“å‡ºè·¯å¾„ï¼Œä¿å­˜èƒŒæ™¯å›¾å±‚çš„å­˜æ”¾ä½ç½®
-    :param transparency: é€æ˜åº¦è®¾ç½®
+    Ìí¼Ó±³¾°Í¼²ã
+    :param path_toolbox: ¹¤¾ßÂ·¾¶£¬¿É»ñµÃlyr¡¢Êı¾İ¿âÂ·¾¶
+    :param input_fc: ÊäÈëÒªËØ£¬È»ºó²Á³ı
+    :param output: Êä³öÂ·¾¶£¬±£´æ±³¾°Í¼²ãµÄ´æ·ÅÎ»ÖÃ
+    :param transparency: Í¸Ã÷¶ÈÉèÖÃ
     :return:
     """
     ##### Add backgroud layer and erase
@@ -147,20 +152,20 @@ def add_background_layer(path_toolbox, input_fc, output, transparency):
 if __name__ == '__main__':
     #------------------------------
     #------------path--------------
-    # è¿”å›å·¥å…·ç®±çš„å®Œæ•´åç§°
+    # ·µ»Ø¹¤¾ßÏäµÄÍêÕûÃû³Æ
     
     toolbox = os.path.abspath(sys.argv[0])
     arcpy.AddMessage(toolbox)
     # E:\Document\MoveOn\MyBlogPy2\BlogCode\StyleToolCode\SolidBoundaryLine.py
 
-    #@@ æœªå¯¼å…¥å·¥å…·ç®±ä¸­
+    #@@ Î´µ¼Èë¹¤¾ßÏäÖĞ
     
     # tool_dir = os.path.abspath(os.path.join(os.path.dirname(toolbox),"StyleTool"))
     #@@ Run in toolbox
     tool_dir = os.path.abspath(os.path.dirname(toolbox))
     # lyr
     dir_lyr = os.path.join(tool_dir, "lyr") # StyleTool/lyr
-    # åˆ¶å›¾è¡¨è¾¾ç›¸å…³
+    # ÖÆÍ¼±í´ïÏà¹Ø
     
     representation = os.path.join(tool_dir, "Representation")
     rp_gdb = os.path.join(representation, "rep_base.gdb")
@@ -182,3 +187,7 @@ if __name__ == '__main__':
     update_representation(arcpy.GetParameterAsText(0), rep_lyrr,
                           arcpy.GetParameterAsText(1),
                           arcpy.GetParameterAsText(3))
+    
+    arcpy.AddMessage("\n|---------------------------------|")
+    arcpy.AddMessage(" -----  ¹¤¾ßÓÉ GISÜö ÖÆ×÷²¢·¢²¼  ------")
+    arcpy.AddMessage("|---------------------------------|\n")

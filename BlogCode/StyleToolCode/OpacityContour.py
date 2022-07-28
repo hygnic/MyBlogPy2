@@ -51,6 +51,8 @@ class OpacityContour(object):
         self.buffered = arcpy.CreateScratchName(prefix="buffered", workspace=os.path.join(os.path.dirname(self.output)))
         # self.buffered = "in_memory/lyr10987"
         arcpy.MultipleRingBuffer_analysis(inputfile, self.buffered, distance, "Meters", Outside_Polygons_Only=True)
+        
+        # 将相同距离的缓冲区合并，因为在某些情况下，同一距离的缓冲区可能会变成几个要素
         # Dissolve same distance feature
         arcpy.Dissolve_management(self.buffered, self.output, dissolve_field="distance", statistics_fields="", multi_part="MULTI_PART", unsplit_lines="DISSOLVE_LINES")
         # set symbol and add layer to ArcMap

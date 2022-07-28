@@ -31,8 +31,17 @@ def emboss(layer, buffer_distance, out_raster):
     arcpy.gp.EucDistance_sa(in_memory_buffer, in_memory_euc, "", "", "")
     # clip
     in_memory_clip = "in_memory/clip_raster"
-    arcpy.Clip_management(in_memory_euc, "", in_memory_clip, layer, "", True,
+    # ArcMap 10.1
+        # Clip_management (in_raster, rectangle, out_raster, {in_template_dataset}, {nodata_value}, {clipping_geometry})
+    # ArcMap 10.3+
+        # Clip_management(in_raster, rectangle, out_raster, {in_template_dataset}, {nodata_value}, {clipping_geometry}, {maintain_clipping_extent})
+    try:
+        arcpy.Clip_management(in_memory_euc, "", in_memory_clip, layer, "", True,
                           False)
+    # except TypeError as e:
+    except Exception as e:
+        arcpy.Clip_management(in_memory_euc, "", in_memory_clip, layer, "", True)
+    
     arcpy.env.addOutputsToMap = True
     # output_raster = "eds2"
     # hill shadow
@@ -47,8 +56,8 @@ if __name__ == '__main__':
     
     arcpy.env.overwriteOutput = True
     lyrr_name = arcpy.GetParameterAsText(0)
-    arcpy.AddMessage(lyrr_name)  # XJQY5203242019
-    arcpy.AddMessage(type(lyrr_name))  # <type 'unicode'>
+    # arcpy.AddMessage(lyrr_name)  # XJQY5203242019
+    # arcpy.AddMessage(type(lyrr_name))  # <type 'unicode'>
     input_distance = arcpy.GetParameterAsText(1)
     output_raster = arcpy.GetParameterAsText(2)
     # mxd1 = arcpy.mapping.MapDocument("CURRENT")
@@ -59,5 +68,9 @@ if __name__ == '__main__':
     arcpy.env.mask = lyrr_name
     
     emboss(lyrr_name, input_distance, output_raster)
+    arcpy.AddMessage("\n|---------------------------------|")
+    arcpy.AddMessage(" -----  工具由 GIS荟 制作并发布  ------")
+    arcpy.AddMessage("|---------------------------------|\n")
+    
     arcpy.RefreshActiveView()
     arcpy.RefreshTOC()
