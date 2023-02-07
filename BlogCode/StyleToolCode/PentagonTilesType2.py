@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+# -*- coding:cp936 -*-
 # -------------------------------------------
 # Name:              4.ManyPentagonTilesType2
 # Author:            Hygnic
@@ -19,11 +19,11 @@ import random
 
 
 """--------------------------------------"""
-"""--------åŸºæœ¬æ–¹æ³•------"""
+"""--------»ù±¾·½·¨------"""
 
 
 def conver_point2polgon(a_list):
-    """å°†æ™®é€šçš„ç‚¹æ•°æ®è½¬æ¢æˆå¯ä»¥åˆ¶ä½œè¦ç´ çš„é¢"""
+    """½«ÆÕÍ¨µÄµãÊı¾İ×ª»»³É¿ÉÒÔÖÆ×÷ÒªËØµÄÃæ"""
     point_obj = [arcpy.Point(i[0], i[1]) for i in a_list]
     polygon = arcpy.Polygon(arcpy.Array(point_obj))
     return polygon
@@ -31,9 +31,9 @@ def conver_point2polgon(a_list):
 
 def check_extent(input_layer):
     """
-    è·å–è¾“å…¥å›¾å±‚ï¼ˆè¦ç´ ç±»æˆ–è€…æ …æ ¼ï¼‰çš„å°ºå¯¸
-    :param input_layer: è¾“å…¥å›¾å±‚
-    :return: åŸç‚¹ï¼Œå®½ï¼Œé«˜
+    »ñÈ¡ÊäÈëÍ¼²ã£¨ÒªËØÀà»òÕßÕ¤¸ñ£©µÄ³ß´ç
+    :param input_layer: ÊäÈëÍ¼²ã
+    :return: Ô­µã£¬¿í£¬¸ß
     """
     lyr = arcpy.mapping.Layer(input_layer)
     lyr_e = lyr.getExtent()
@@ -44,11 +44,11 @@ def check_extent(input_layer):
 
 def tile_creator(array_obj, featurecalss):
     """
-    æå–å…¶ä¸­çš„ä¸€ç»„äº”è¾¹å½¢ï¼Œå†æå–æ¯ç»„äº”è¾¹å½¢ä¸­çš„ä¸€ä¸ªç‚¹ï¼Œå°†å…¶è½¬æ¢ä¸º arcpy.Point å¯¹è±¡ï¼Œå¤šä¸ª
-    arcpy.Point å¯¹è±¡è½¬æ¢ä¸º  arcpy.Array å¯¹è±¡ï¼Œç„¶åä½¿ç”¨  arcpy.Array å¯¹è±¡åˆ›å»º
-    arcpy.Polygon å‡ ä½•å¯¹è±¡ï¼Œæœ€åå°†å‡ ä½•å¯¹è±¡å…¶æ’å…¥è¦ç´ ç±»
-    :param array_obj:åŒ…å«å¤šç»„äº”è¾¹å½¢çš„åˆ—è¡¨
-    :param featurecalss: è¾“å‡ºçŸ¢é‡æ–‡ä»¶
+    ÌáÈ¡ÆäÖĞµÄÒ»×éÎå±ßĞÎ£¬ÔÙÌáÈ¡Ã¿×éÎå±ßĞÎÖĞµÄÒ»¸öµã£¬½«Æä×ª»»Îª arcpy.Point ¶ÔÏó£¬¶à¸ö
+    arcpy.Point ¶ÔÏó×ª»»Îª  arcpy.Array ¶ÔÏó£¬È»ºóÊ¹ÓÃ  arcpy.Array ¶ÔÏó´´½¨
+    arcpy.Polygon ¼¸ºÎ¶ÔÏó£¬×îºó½«¼¸ºÎ¶ÔÏóÆä²åÈëÒªËØÀà
+    :param array_obj:°üº¬¶à×éÎå±ßĞÎµÄÁĞ±í
+    :param featurecalss: Êä³öÊ¸Á¿ÎÄ¼ş
     :return:
     """
     inser_cursor = arcpy.da.InsertCursor(featurecalss, "SHAPE@")
@@ -67,20 +67,25 @@ def tile_creator(array_obj, featurecalss):
     del inser_cursor
 
 
-"""--------åŸºæœ¬æ–¹æ³•------"""
+
+arcpy.AddMessage("\n|---------------------------------|")
+arcpy.AddMessage(" -----  ¹¤¾ßÓÉ GISÜö ÖÆ×÷²¢·¢²¼  ------")
+arcpy.AddMessage("|---------------------------------|\n")
+
+"""--------»ù±¾·½·¨------"""
 """--------------------------------------"""
 
 """--------------------------------------"""
-"""--------åŸºæœ¬å±æ€§------"""
+"""--------»ù±¾ÊôĞÔ------"""
 
-"""--------å·¥å…·ç®±æ¥å£------"""
-"""--------å·¥å…·ç®±æ¥å£------"""
+"""--------¹¤¾ßÏä½Ó¿Ú------"""
+"""--------¹¤¾ßÏä½Ó¿Ú------"""
 input_fc = arcpy.GetParameterAsText(0)  # featureclass
 output_fc = arcpy.GetParameterAsText(1)  # featureclass
 side_length = int(arcpy.GetParameterAsText(2))
 long_side_length = int(arcpy.GetParameterAsText(3))
-num = int(arcpy.GetParameterAsText(4))  # x,yè½´æ‰©å±•å€æ•°
-# æµ‹è¯•ç”¨
+num = int(arcpy.GetParameterAsText(4))  # x,yÖáÀ©Õ¹±¶Êı
+# ²âÊÔÓÃ
 # input_fc = r"C:\Users\Administrator\Documents\ArcGIS\Default.gdb" \
 #            r"\Export_Output_2 "
 # output_fc = r"C:\Users\Administrator\Documents\ArcGIS\Default.gdb\Output_e"
@@ -91,14 +96,14 @@ num = int(arcpy.GetParameterAsText(4))  # x,yè½´æ‰©å±•å€æ•°
 ws = os.path.dirname(output_fc)
 fc_name = os.path.basename(output_fc)
 # arcpy.env.scratchWorkspace = ws
-"""--------å·¥å…·ç®±æ¥å£------"""
-"""--------å·¥å…·ç®±æ¥å£------"""
+"""--------¹¤¾ßÏä½Ó¿Ú------"""
+"""--------¹¤¾ßÏä½Ó¿Ú------"""
 
 # ws = os.path.abspath(os.getcwd())
 arcpy.env.workspace = ws
 arcpy.env.overwriteOutput = True
 
-# åæ ‡åŸç‚¹
+# ×ø±êÔ­µã
 # lyr_o, lyr_w, lyr_h, sr=check_extent("data/grid.shp")
 lyr_o, lyr_w, lyr_h, sr = check_extent(input_fc)
 print "featureclass width:{}".format(lyr_w)
@@ -109,14 +114,14 @@ oY = origin[1]
 print "origin X:{}".format(oX)
 print "origin Y:{}".format(oY)
 
-# è§’åº¦
+# ½Ç¶È
 angle01 = 60
-# äº”è¾¹å½¢çŸ­è¾¹é•¿åº¦
+# Îå±ßĞÎ¶Ì±ß³¤¶È
 # length = 600
 length = side_length
-# é•¿è¾¹é•¿åº¦ï¼ˆx è½´æ–¹å‘è¾¹é•¿é•¿åº¦ï¼‰
+# ³¤±ß³¤¶È£¨x Öá·½Ïò±ß³¤³¤¶È£©
 leng = length * sin(radians(angle01)) * 2
-# é«˜ ï¼ˆy è½´æ–¹å‘è¾¹é•¿é«˜åº¦ï¼Œæ²¡æœ‰çº¦æŸï¼‰
+# ¸ß £¨y Öá·½Ïò±ß³¤¸ß¶È£¬Ã»ÓĞÔ¼Êø£©
 
 # ht = leng*2
 
@@ -125,21 +130,21 @@ cfm = arcpy.CreateFeatureclass_management
 # shpfile = cfm(ws, "PentagonTile2", "polygon", spatial_reference=sr)
 shpfile = cfm(ws, fc_name + "012047", "polygon", spatial_reference=sr)
 
-"""--------åŸºæœ¬å±æ€§------"""
+"""--------»ù±¾ÊôĞÔ------"""
 """--------------------------------------"""
 
 """--------------------------------------"""
-"""--------åŸºæœ¬åæ ‡------"""
-# è¯¥äº”è¾¹å½¢ä¸¤ä¸ªä¸€ç»„
+"""--------»ù±¾×ø±ê------"""
+# ¸ÃÎå±ßĞÎÁ½¸öÒ»×é
 
-# ä¸ŠåŠéƒ¨åˆ†
+# ÉÏ°ë²¿·Ö
 pta = (oX + leng, oY)
 ptb = (pta[0], ht + oY)
 ptc = (oX + leng / 2, ht + oY + length / 2)
 ptd = (oX, oY + ht)
 pte = origin
 
-# ä¸‹åŠéƒ¨åˆ†
+# ÏÂ°ë²¿·Ö
 pta2 = (pta[0], pta[1])
 ptb2 = (ptb[0], oY - ht)
 ptc2 = (ptc[0], oY - ht - length / 2)
@@ -149,19 +154,19 @@ pte2 = origin
 pts = [pta, ptb, ptc, ptd, pte,
        pta2, ptb2, ptc2, ptd2, pte2]
 
-"""--------åŸºæœ¬åæ ‡------"""
+"""--------»ù±¾×ø±ê------"""
 """--------------------------------------"""
 
 """--------------------------------------"""
-"""--------æ„å»ºè¦ç´ ------"""
-# åç§»è·ç¦»
-# å³ä¸Šè§’è·ç¦»
+"""--------¹¹½¨ÒªËØ------"""
+# Æ«ÒÆ¾àÀë
+# ÓÒÉÏ½Ç¾àÀë
 
 offset_x = -leng / 2
 
 offset_y = ht * 2 + length / 2
 
-# æ­£å³æ–¹å‘åç§»
+# ÕıÓÒ·½ÏòÆ«ÒÆ
 
 offset_x2 = leng
 offset_y2 = 0
@@ -171,18 +176,18 @@ offset_y2 = 0
 # B = pts[5:]
 # print A
 # print B
-# tile_creator([B], shpfile) # TODO [B]å°±è¡Œï¼ŒBä¸è¡Œ
+# tile_creator([B], shpfile) # TODO [B]¾ÍĞĞ£¬B²»ĞĞ
 # test
 
-# yè½´æ–¹å‘å¾ªç¯æ¬¡æ•°
+# yÖá·½ÏòÑ­»·´ÎÊı
 
 loop_y = int(lyr_h / (ht * 2 + length))
 print loop_y
-array_pt = []  # ç”¨äºå­˜æ”¾ä¸€æ•´åˆ—çš„äº”è¾¹å½¢
+array_pt = []  # ÓÃÓÚ´æ·ÅÒ»ÕûÁĞµÄÎå±ßĞÎ
 
 # for i in xrange(int(loop_y*1.2)):
 for i in xrange(int(loop_y * num)):
-    # å‘ä¸Šåç§»è·ç¦»
+    # ÏòÉÏÆ«ÒÆ¾àÀë
     new_pts = [(_[0] + offset_x * i, _[1] + offset_y * i) for _ in pts]
     
     A = new_pts[:5]
@@ -190,9 +195,9 @@ for i in xrange(int(loop_y * num)):
     array_pt.append(A)
     array_pt.append(B)
 
-arcpy.AddMessage("Start to Ccreate Geometry...\n")
+arcpy.AddMessage("Start to Ccreate Geometry...")
 loop_x = int(lyr_w / leng)
-# æ‰©å±•å€æ•°
+# À©Õ¹±¶Êı
 for _ in xrange(int(loop_x * num)):
     tile_creator(array_pt, shpfile)
     # array_pt = [[(12613045.67822186, 2643673.2934923917),
@@ -206,7 +211,7 @@ for _ in xrange(int(loop_x * num)):
                 # (12612959.075681482, 2643423.2934923917),
                 # (12612872.473141104, 2643473.2934923917),
                 # (12612872.473141104, 2643673.2934923917)]]
-    # åˆ—è¡¨ä¸­æ¯ä¸€ä¸ªç‚¹é€’å¢ï¼Œå¢åŠ åå†å°è£…æˆåˆ—è¡¨
+    # ÁĞ±íÖĞÃ¿Ò»¸öµãµİÔö£¬Ôö¼ÓºóÔÙ·â×°³ÉÁĞ±í
     array_pt2 = []
     for point_list in array_pt:
         
@@ -216,15 +221,17 @@ for _ in xrange(int(loop_x * num)):
     
     # np_array = np_array + (offset_x2, offset_y2)
 
-"""--------æ„å»ºè¦ç´ ------"""
+"""--------¹¹½¨ÒªËØ------"""
 """--------------------------------------"""
 
 """--------------------------------------"""
-"""--------åˆ é™¤èŒƒå›´å¤–çš„è¦ç´ ------"""
-arcpy.AddMessage("Geometry Created\n")
+"""--------É¾³ı·¶Î§ÍâµÄÒªËØ------"""
+arcpy.AddMessage("Geometry Created")
 feature_layer = "f_layer"
-arcpy.MakeFeatureLayer_management(shpfile, feature_layer)
-
+try:
+    arcpy.MakeFeatureLayer_management(shpfile, feature_layer)
+except UnicodeEncodeError:
+    arcpy.AddError("\nÓÉÓÚArcMap°æ±¾µÄ¾ÖÏŞ£¬ÇëÊ¹ÓÃ´¿Ó¢ÎÄÊä³öÂ·¾¶£¡")
 arcpy.SelectLayerByLocation_management(feature_layer,
                                        "INTERSECT", input_fc)
 arcpy.CopyFeatures_management(feature_layer, output_fc)
@@ -233,6 +240,7 @@ arcpy.Delete_management(shpfile)
 # arcpy.env.mask = input_fc
 # arcpy.CopyFeatures_management(shpfile, output_fc)
 
-arcpy.AddMessage("Geometry Cliped\n")
-"""--------åˆ é™¤èŒƒå›´å¤–çš„è¦ç´ ------"""
+arcpy.AddMessage("Geometry Cliped")
+arcpy.AddMessage("Finshed")
+"""--------É¾³ı·¶Î§ÍâµÄÒªËØ------"""
 """--------------------------------------"""

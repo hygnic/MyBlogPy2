@@ -150,6 +150,10 @@ def add_background_layer(path_toolbox, input_fc, output, transparency):
     del df
 
 if __name__ == '__main__':
+    arcpy.AddMessage("\n|---------------------------------|")
+    arcpy.AddMessage(" -----  工具由 GIS荟 制作并发布  ------")
+    arcpy.AddMessage("|---------------------------------|\n")
+    
     #------------------------------
     #------------path--------------
     # 返回工具箱的完整名称
@@ -188,6 +192,3 @@ if __name__ == '__main__':
                           arcpy.GetParameterAsText(1),
                           arcpy.GetParameterAsText(3))
     
-    arcpy.AddMessage("\n|---------------------------------|")
-    arcpy.AddMessage(" -----  工具由 GIS荟 制作并发布  ------")
-    arcpy.AddMessage("|---------------------------------|\n")

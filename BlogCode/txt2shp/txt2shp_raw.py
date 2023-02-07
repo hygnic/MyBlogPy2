@@ -84,10 +84,14 @@ def points_genarator(txt_file):
 		# input_data = [x.strip() for x in input_data]
 		# input_data = input_data[2:]  # 去除前13行
 		#▶注释1◀ 去除带@的行
+		
 		input_data = [x.strip() for x in input_data if "@" not in x]
 		# 去除非J行
-		while True:  # 去除前13行
+		# 去除前13行
+		
+		while True:
 			# 如果首行字符不在下列元组中
+			
 			first = ("J", "1", "0", "2", "3", "4", "5", "6", "7", "8", "9")
 			if input_data[0][0] not in first:
 				del input_data[0]
@@ -95,37 +99,51 @@ def points_genarator(txt_file):
 			#  del input_data[0]
 			else:
 				break
-		# input_data = input_data[12:]  # 去除前13行
+		# input_data = input_data[12:]
 		fffs.close()
 		# 每一根闭合线单独组成一个列表
+		
 		line_closed = []
 		# 多根线条组成面
+		
 		polygon_list = []
-		#▶注释2◀
+		
 		while input_data:
 			row = input_data.pop(0)
 			# ['J1', '1', '3405133.8969', '35353662.0113']
 			row1 = row.split(",")
 			# 去除字母和数字组合中的字母 如 "J1" 只保留 "1"
+			
 			row_num = re.findall(r'[0-9]+|[a-z]+', row1[0])  # ['1']
 			# 解决了文本最后有空行会报错的问题
+			
 			if row1 == [""] or row1 == [" "]:
-				# print u"&<{}> 存在空行 \n 已解决\n&".format(txt_file)
 				continue
 			row_num2 = row1[1]
-			if not line_closed:  # 为空时
+			if not line_closed:
+				# 为空时
+				
 				line_closed.append(row1)
-				flag1 = int(row_num[0])  # 1 第一列数字
+				# 1 第一列数字
+				
+				flag1 = int(row_num[0])
 				# 第二列数字
+				
 				flag2 = row1[1]  # '1'
 			elif int(row_num[0]) > flag1:
-				if row_num2 != flag2:  # 第二列出现不一样的，新一轮开始
+				# 第二列出现不一样的，新一轮开始
+				
+				if row_num2 != flag2:
 					flag2 = row_num2
 					polygon_list.append(line_closed)
 					line_closed = []
+					
 				# 未开始新一轮就接着上一个，如果开始新一轮那么这里就是第一个起始点
+				
 				line_closed.append(row1)
-			elif int(row_num[0]) == flag1:  # 新一轮开始
+			elif int(row_num[0]) == flag1:
+				# 新一轮开始
+				
 				polygon_list.append(line_closed)
 				line_closed = []
 				line_closed.append(row1)
@@ -135,6 +153,7 @@ def points_genarator(txt_file):
 	
 	except Exception as e:
 		# 这样报错就能知道是遍历的那个文件出错了
+		
 		raise IndexError(e.message,"Error File: {}".format(txt_file))
 		
 
@@ -166,6 +185,7 @@ def draw_poly(coord_list, sr, y, x):
 		parts.add(yuans)
 		yuans.removeAll()
 	# 只有一个，单个图形
+	
 	if len(parts) == 1:
 		parts = parts.getObject(0)
 	return arcpy.Polygon(parts, sr)
@@ -185,15 +205,12 @@ def main(info, txt_folder, output_folder):
 			txt_p = os.path.join(txt_folder, txt)
 			f = points_genarator(txt_p)
 			name = os.path.splitext(os.path.basename(txt_p))[0]
-			# 创建空白shp
 			blank_shp = arcpy.CreateFeatureclass_management(
 				output_folder,name, "Polygon",
 				spatial_reference=None)
 			# create the polygons and write them
 			Rows = arcpy.da.InsertCursor(blank_shp, "SHAPE@")
-			#▶注释3◀
 			p = draw_poly(f, sr=None, y=3, x=2)
-			
 			Rows.insertRow([p])
 			del Rows
 			output_info = "--Export succeed: " + os.path.join(
@@ -202,6 +219,7 @@ def main(info, txt_folder, output_folder):
 			info.append(output_info)
 			
 			# 给新建的shp文件添加 MC 字段和值
+			
 			shp_name = name + ".shp"
 			newfield_name = "MC"
 			fresh_layer = arcpy.mapping.Layer(
@@ -215,19 +233,25 @@ def main(info, txt_folder, output_folder):
 			del cursor2
 
 
-
 if __name__ == '__main__':
-	"""脚本单独使用"""
-	"""----------------------------------------------"""
-	"""---------------------PARA---------------------"""
-	arcpy.env.overwriteOutput = True
-	#▶注释4◀
-	dir_p = ur"D:\MoveOn\MyBlogPy2\BlogCode\txt2shp\test_texfile"  # txt文件夹
-	output_dir = ur"D:\MoveOn\MyBlogPy2\BlogCode\txt2shp\test_outfile"  # 输出文件夹
+	o=2
+	if o==1:
+		
+		arcpy.env.overwriteOutput = True
+		dir_p = ur"D:\MoveOn\MyBlogPy2\BlogCode\txt2shp\test_texfile"  # txt文件夹
+		output_dir = ur"D:\MoveOn\MyBlogPy2\BlogCode\txt2shp\test_outfile"  # 输出文件夹
 	
-	# dir_p = ur"G:\高标准分布图\金堂县\txt"  # txt文件夹
-	# output_dir = ur"G:\高标准分布图\金堂县\新建文件夹"  # 输出文件夹
-	"""----------------------------------------------"""
-	"""----------------------------------------------"""
-	infos = []
-	main(infos, dir_p, output_dir)
+		# dir_p = ur"G:\高标准分布图\金堂县\txt"  # txt文件夹
+		# output_dir = ur"G:\高标准分布图\金堂县\新建文件夹"  # 输出文件夹
+		"""----------------------------------------------"""
+		"""----------------------------------------------"""
+		infos = []
+		main(infos, dir_p, output_dir)
+	
+	else:
+		arcpy.AddMessage("Toolbox")
+		arcpy.env.overwriteOutput = True
+		para1_txtdir = arcpy.GetParameterAsText(0)
+		para2_out = arcpy.GetParameterAsText(1)
+		infos = []
+		main(infos, para1_txtdir, para2_out)

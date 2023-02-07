@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+# -*- coding:cp936 -*-
 # -------------------------------------------
 # Name:              OpacityContour
 # Author:            Hygnic
@@ -6,7 +6,7 @@
 # Version:           
 # Reference:         
 """
-Description:         <<ç¼“å†²åŒºè½®å»“>> å¯ä»¥é€‰æ‹©ç¼“å†²åŒºæ‰©å¤§å€æ•°
+Description:         <<»º³åÇøÂÖÀª>> ¿ÉÒÔÑ¡Ôñ»º³åÇøÀ©´ó±¶Êı
 Usage:               
 """
 # -------------------------------------------
@@ -17,9 +17,9 @@ import sys
 
 
 class BufferContour(object):
-    # åˆ›å»ºç¼“å†²åŒºå¤–è¾¹ç¼˜ã€‚
-    # 1.å…ˆåˆ›å»º3å±‚ç¼“å†²åŒº
-    # 2.æ–°å»ºå­—æ®µç”¨äºå­˜æ”¾ä¸åŒçº§åˆ«çš„ç¼“å†²åŒº
+    # ´´½¨»º³åÇøÍâ±ßÔµ¡£
+    # 1.ÏÈ´´½¨3²ã»º³åÇø
+    # 2.ĞÂ½¨×Ö¶ÎÓÃÓÚ´æ·Å²»Í¬¼¶±ğµÄ»º³åÇø
     
     def __init__(self, in_f, times, lyr, output):
         self.mxd = arcpy.mapping.MapDocument("CURRENT")
@@ -64,10 +64,10 @@ class BufferContour(object):
         
     """--------------------------------"""
     """--------------------------------"""
-    """å­—æ®µæ·»åŠ """
+    """Add Field"""
     def check_field_exit(self, field_obj, check_field):
         """
-        æ£€æŸ¥å›¾å±‚æ˜¯å¦å­˜åœ¨è¯¥å­—æ®µ
+        ¼ì²éÍ¼²ãÊÇ·ñ´æÔÚ¸Ã×Ö¶Î
         :param field_obj: field_obj = arcpy.ListFields(layer)
         :param check_field: field
         :return: {Bolean}
@@ -77,18 +77,18 @@ class BufferContour(object):
     
     
     def add_field(self, layer, names, f_type, f_length=None, delete=True):
-        """æ·»åŠ ç›¸åŒç±»å‹å’Œé•¿åº¦çš„å¤šä¸ªæˆ–è€…å•ä¸ªå­—æ®µï¼Œåªæ”¯æŒè¦ç´ å›¾å±‚(å¦‚æœå­˜åœ¨ç›¸åŒåå­—çš„å­—æ®µåˆ™ä¸ä¼šæ·»åŠ å­—æ®µ)
-          <ç‰¹åˆ«æ³¨æ„å› ä¸ºå­—æ®µç±»å‹å’Œé•¿åº¦é€ æˆçš„åç»­é”™è¯¯>
+        """Ìí¼ÓÏàÍ¬ÀàĞÍºÍ³¤¶ÈµÄ¶à¸ö»òÕßµ¥¸ö×Ö¶Î£¬Ö»Ö§³ÖÒªËØÍ¼²ã(Èç¹û´æÔÚÏàÍ¬Ãû×ÖµÄ×Ö¶ÎÔò²»»áÌí¼Ó×Ö¶Î)
+          <ÌØ±ğ×¢ÒâÒòÎª×Ö¶ÎÀàĞÍºÍ³¤¶ÈÔì³ÉµÄºóĞø´íÎó>
           such as: add_field(layer_p,["ZWMC1","ZWMC2"],"TEXT",50)
-        layer{String}: shpæ–‡ä»¶å¯¹è±¡
-          # TODO æŒ‰ç†åº”è¯¥å¯ä»¥ä½¿ç”¨å›¾å±‚å¯¹è±¡ï¼Œarcpy.mapping.Layer(path)ï¼Œä½†æ˜¯æŠ¥é”™ï¼ˆarcgis10.3ï¼‰
-              # å·²ç»è§£å†³ï¼š å› ä¸ºarcpy.AddField_management åªæ”¯æŒè¦ç´ å›¾å±‚ï¼Œå¦‚æœæ˜¯shpæ–‡ä»¶åœ°å€çš„è¯
-              # éœ€è¦ä½¿ç”¨arcpy.MakeFeatureLayer_managementå‡½æ•°å°†è¦ç´ ç±»è½¬ä¸ºè¦ç´ å›¾å±‚
-        names: {List} æ–°å¢å­—æ®µåç§°
-        f_type: {String} å­—æ®µç±»å‹
-        f_length: {Long} å­—æ®µé•¿åº¦
-        delete: {Boolean} True å¦‚æœå­˜åœ¨è¯¥å­—æ®µï¼Œå…ˆåˆ é™¤å†åˆ›å»º
-        return: è¿”å›å½“å‰çš„å›¾å±‚å¯¹è±¡
+        layer{String}: shpÎÄ¼ş¶ÔÏó
+          # TODO °´ÀíÓ¦¸Ã¿ÉÒÔÊ¹ÓÃÍ¼²ã¶ÔÏó£¬arcpy.mapping.Layer(path)£¬µ«ÊÇ±¨´í£¨arcgis10.3£©
+              # ÒÑ¾­½â¾ö£º ÒòÎªarcpy.AddField_management Ö»Ö§³ÖÒªËØÍ¼²ã£¬Èç¹ûÊÇshpÎÄ¼şµØÖ·µÄ»°
+              # ĞèÒªÊ¹ÓÃarcpy.MakeFeatureLayer_managementº¯Êı½«ÒªËØÀà×ªÎªÒªËØÍ¼²ã
+        names: {List} ĞÂÔö×Ö¶ÎÃû³Æ
+        f_type: {String} ×Ö¶ÎÀàĞÍ
+        f_length: {Long} ×Ö¶Î³¤¶È
+        delete: {Boolean} True Èç¹û´æÔÚ¸Ã×Ö¶Î£¬ÏÈÉ¾³ıÔÙ´´½¨
+        return: ·µ»Øµ±Ç°µÄÍ¼²ã¶ÔÏó
         """
         the_fields = arcpy.ListFields(layer)
         for name in names:
@@ -96,7 +96,7 @@ class BufferContour(object):
                 arcpy.AddField_management(layer, name, f_type, field_length=f_length)
                 msg = "Created {0} field success".format(name)
                 print msg
-            # å­˜åœ¨è¯¥å­—æ®µ
+            # ´æÔÚ¸Ã×Ö¶Î
             else:
                 if delete:
                     arcpy.DeleteField_management (layer, name)
@@ -105,24 +105,26 @@ class BufferContour(object):
                     print "Field exist"
         
         return layer
-    """å­—æ®µæ·»åŠ """
+    """Add Field"""
     """--------------------------------"""
     """--------------------------------"""
     
 
 if __name__ == '__main__':
-    arcpy.AddMessage("------------------")
+    arcpy.AddMessage("\n|---------------------------------|")
+    arcpy.AddMessage(" -----  ¹¤¾ßÓÉ GISÜö ÖÆ×÷²¢·¢²¼  ------")
+    arcpy.AddMessage("|---------------------------------|\n")
+    
     #------------------------------
     #------------path--------------
-    #       åœ¨å¯¼å…¥çš„æƒ…å†µä¸‹
+    #       ÔÚµ¼ÈëµÄÇé¿öÏÂ
     # arcpy.AddMessage("CURRENT: {}".format(os.getcwd()))
     # CURRENT: C:\Windows\system32
     
-    # è¿”å›å·¥å…·ç®±çš„å®Œæ•´åç§°
+    # ·µ»Ø¹¤¾ßÏäµÄÍêÕûÃû³Æ
     toolbox = os.path.abspath(sys.argv[0])
-    
     tool_dir = os.path.abspath(os.path.dirname(toolbox))
-    # lyr
+    # get style lyr path
     dir_lyr = os.path.join(tool_dir, "lyr") # StyleTool/lyr
     #------------path--------------
     #------------------------------
