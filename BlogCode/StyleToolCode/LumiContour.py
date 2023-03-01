@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+# -*- coding:cp936 -*-
 # -------------------------------------------
 # Name:              LumiContour
 # Author:            Hygnic
@@ -6,30 +6,31 @@
 # Version:           
 # Reference:         
 """
-Description:         å‘å…‰è½®å»“ 9çº§ç¼“å†²ï¼ŒåŒä¸€ç§é¢œè‰²ï¼Œä¸è¿‡é€æ˜åº¦
-                     ä¾æ¬¡é™ä½
-                     ä½¿ç”¨ opacity.lyr
-                     å·²ç»å¯¼å…¥å·¥å…·ç®± <<å‘å…‰è½®å»“>>
+Description:         ·¢¹âÂÖÀª 9¼¶»º³å£¬Í¬Ò»ÖÖÑÕÉ«£¬²»¹ıÍ¸Ã÷¶È
+                     ÒÀ´Î½µµÍ
+                     Ê¹ÓÃ opacity.lyr
+                     ÒÑ¾­µ¼Èë¹¤¾ßÏä <<·¢¹âÂÖÀª>>
 Usage:               
 """
 # -------------------------------------------
 import arcpy
 import os
 import sys
+from random import randint
 
 
 
 class OpacityContour(object):
-    # åˆ›å»ºé€æ˜æ¸å˜çš„å¤–è¾¹ç¼˜ã€‚
-    # 1.å…ˆåˆ›å»º9å±‚ç¼“å†²åŒº
-    # 2.æ–°å»ºå­—æ®µç”¨äºå­˜æ”¾ä¸åŒçº§åˆ«ç¼“å†²åŒºçš„é€æ˜åº¦
+    # ´´½¨Í¸Ã÷½¥±äµÄÍâ±ßÔµ¡£
+    # 1.ÏÈ´´½¨9²ã»º³åÇø
+    # 2.ĞÂ½¨×Ö¶ÎÓÃÓÚ´æ·Å²»Í¬¼¶±ğ»º³åÇøµÄÍ¸Ã÷¶È
     
     def __init__(self, in_f, times, lyr, output):
         """
-        :param in_f: è¾“å…¥è¦ç´ 
-        :param times: æ”¾å¤§å€æ•°
-        :param lyr: lyr æ•ˆæœå›¾å±‚
-        :param output: æ ·å¼å›¾å±‚è¾“å‡º
+        :param in_f: ÊäÈëÒªËØ
+        :param times: ·Å´ó±¶Êı
+        :param lyr: lyr Ğ§¹ûÍ¼²ã
+        :param output: ÑùÊ½Í¼²ãÊä³ö
         """
         self.mxd = arcpy.mapping.MapDocument("CURRENT")
         self.df = arcpy.mapping.ListDataFrames(self.mxd)[0]
@@ -46,14 +47,16 @@ class OpacityContour(object):
         arcpy.Delete_management(self.buffered)
 
     def make_buffer_ring(self):
+        arcpy.AddMessage("Making buffer rings¡­¡­")
         num = int(self.times)
         inputfile = self.in_f
         distance = [_*num for _ in self.distance]
-        self.buffered = arcpy.CreateScratchName(prefix="buffered", workspace=os.path.join(os.path.dirname(self.output)))
-        # self.buffered = "in_memory/lyr10987"
+        # self.buffered = arcpy.CreateScratchName(prefix="buffered", workspace=os.path.join(os.path.dirname(self.output)))
+        buffername = "in_memory/ne"+str(randint(1, 10000))
+        self.buffered = buffername
         arcpy.MultipleRingBuffer_analysis(inputfile, self.buffered, distance, "Meters", Outside_Polygons_Only=True)
         
-        # å°†ç›¸åŒè·ç¦»çš„ç¼“å†²åŒºåˆå¹¶ï¼Œå› ä¸ºåœ¨æŸäº›æƒ…å†µä¸‹ï¼ŒåŒä¸€è·ç¦»çš„ç¼“å†²åŒºå¯èƒ½ä¼šå˜æˆå‡ ä¸ªè¦ç´ 
+        # ½«ÏàÍ¬¾àÀëµÄ»º³åÇøºÏ²¢£¬ÒòÎªÔÚÄ³Ğ©Çé¿öÏÂ£¬Í¬Ò»¾àÀëµÄ»º³åÇø¿ÉÄÜ»á±ä³É¼¸¸öÒªËØ
         # Dissolve same distance feature
         arcpy.Dissolve_management(self.buffered, self.output, dissolve_field="distance", statistics_fields="", multi_part="MULTI_PART", unsplit_lines="DISSOLVE_LINES")
         # set symbol and add layer to ArcMap
@@ -63,8 +66,11 @@ class OpacityContour(object):
         
     def set_opacity(self):
         f_name = "opacity"
-        arcpy.AddMessage("Set opacity")
-        self.add_field(self.res_lyr, [f_name], "SHORT")
+        arcpy.AddMessage("Apply style setting¡­¡­")
+        # self.add_field(self.res_lyr, [f_name], "SHORT")
+
+        arcpy.AddField_management(self.res_lyr, f_name, "SHORT", field_length="")
+        
         with arcpy.da.UpdateCursor(self.res_lyr, f_name) as cursor:
             in_count = 0
             for row in cursor:
@@ -74,73 +80,26 @@ class OpacityContour(object):
         arcpy.mapping.UpdateLayer(self.df,  self.res_lyr, self.lyr)
         arcpy.mapping.AddLayer(self.df, self.res_lyr)
         arcpy.AddMessage(self.res_lyr.dataSource)
-        
-    """--------------------------------"""
-    """--------------------------------"""
-    """å­—æ®µæ·»åŠ """
-    def check_field_exit(self, field_obj, check_field):
-        """
-        æ£€æŸ¥å›¾å±‚æ˜¯å¦å­˜åœ¨è¯¥å­—æ®µ
-        :param field_obj: field_obj = arcpy.ListFields(layer)
-        :param check_field: field
-        :return: {Bolean}
-        """
-        field_names = [i.name for i in field_obj] # field.aliasName
-        return check_field in field_names
-    
-    
-    def add_field(self, layer, names, f_type, f_length=None, delete=True):
-        """æ·»åŠ ç›¸åŒç±»å‹å’Œé•¿åº¦çš„å¤šä¸ªæˆ–è€…å•ä¸ªå­—æ®µï¼Œåªæ”¯æŒè¦ç´ å›¾å±‚(å¦‚æœå­˜åœ¨ç›¸åŒåå­—çš„å­—æ®µåˆ™ä¸ä¼šæ·»åŠ å­—æ®µ)
-          <ç‰¹åˆ«æ³¨æ„å› ä¸ºå­—æ®µç±»å‹å’Œé•¿åº¦é€ æˆçš„åç»­é”™è¯¯>
-          such as: add_field(layer_p,["ZWMC1","ZWMC2"],"TEXT",50)
-        layer{String}: shpæ–‡ä»¶å¯¹è±¡
-          # TODO æŒ‰ç†åº”è¯¥å¯ä»¥ä½¿ç”¨å›¾å±‚å¯¹è±¡ï¼Œarcpy.mapping.Layer(path)ï¼Œä½†æ˜¯æŠ¥é”™ï¼ˆarcgis10.3ï¼‰
-              # å·²ç»è§£å†³ï¼š å› ä¸ºarcpy.AddField_management åªæ”¯æŒè¦ç´ å›¾å±‚ï¼Œå¦‚æœæ˜¯shpæ–‡ä»¶åœ°å€çš„è¯
-              # éœ€è¦ä½¿ç”¨arcpy.MakeFeatureLayer_managementå‡½æ•°å°†è¦ç´ ç±»è½¬ä¸ºè¦ç´ å›¾å±‚
-        names: {List} æ–°å¢å­—æ®µåç§°
-        f_type: {String} å­—æ®µç±»å‹
-        f_length: {Long} å­—æ®µé•¿åº¦
-        delete: {Boolean} True å¦‚æœå­˜åœ¨è¯¥å­—æ®µï¼Œå…ˆåˆ é™¤å†åˆ›å»º
-        return: è¿”å›å½“å‰çš„å›¾å±‚å¯¹è±¡
-        """
-        the_fields = arcpy.ListFields(layer)
-        for name in names:
-            if not self.check_field_exit(the_fields, name):
-                arcpy.AddField_management(layer, name, f_type, field_length=f_length)
-                msg = "Created {0} field success".format(name)
-                print msg
-            # å­˜åœ¨è¯¥å­—æ®µ
-            else:
-                if delete:
-                    arcpy.DeleteField_management (layer, name)
-                    arcpy.AddField_management(layer, name, f_type, field_length=f_length)
-                else:
-                    print "Field exist"
-        
-        return layer
-    """å­—æ®µæ·»åŠ """
-    """--------------------------------"""
-    """--------------------------------"""
-    
 
+    
 if __name__ == '__main__':
     #------------------------------
     #------------path--------------
-    #       åœ¨å¯¼å…¥çš„æƒ…å†µä¸‹
+    #       ÔÚµ¼ÈëµÄÇé¿öÏÂ
     # arcpy.AddMessage("CURRENT: {}".format(os.getcwd()))
     # CURRENT: C:\Windows\system32
 
     arcpy.AddMessage("\n|---------------------------------|")
-    arcpy.AddMessage(" -----  å·¥å…·ç”± GISèŸ åˆ¶ä½œå¹¶å‘å¸ƒ  ------")
+    arcpy.AddMessage(" -----  ¹¤¾ßÓÉ GISÜö ÖÆ×÷²¢·¢²¼  ------")
     arcpy.AddMessage("|---------------------------------|\n")
 
 
-# è¿”å›å·¥å…·ç®±çš„å®Œæ•´åç§°
+# ·µ»Ø¹¤¾ßÏäµÄÍêÕûÃû³Æ
     toolbox = os.path.abspath(sys.argv[0])
     tool_dir = os.path.abspath(os.path.dirname(toolbox))
     # lyr
     dir_lyr = os.path.join(tool_dir, "lyr") # StyleTool/lyr
-    # åˆ¶å›¾è¡¨è¾¾æ–‡ä»¶å­˜å‚¨ä½ç½®
+    # ÖÆÍ¼±í´ïÎÄ¼ş´æ´¢Î»ÖÃ
     representation = os.path.join(tool_dir, "Representation")
     rp_gdb = os.path.join(representation, "rep_base.gdb")
     #------------path--------------
