@@ -155,7 +155,6 @@ class PageSizeMatch(object):
             height_info[cursor2l_2[i][0]] = abs(height)
         return height_info
 
-
     #▶注释4◀
     def update_width_height(self, height_infomation):
         """
