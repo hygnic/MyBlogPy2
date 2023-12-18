@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+# -*- coding:CP936 -*-
 # -------------------------------------------
 # Name:              better_isogram
 # Author:            Hygnic
@@ -6,62 +6,93 @@
 # Version:           
 # Reference:         
 """
-Description:       æ›´å¥½çš„ç­‰å€¼çº¿
+Description:       ¸üºÃµÄµÈÖµÏß
 Usage:               
 """
 # -------------------------------------------
 from __future__ import absolute_import
 import arcpy
+import os
+from random import randint
 
-arcpy.env.overwriteOutput = True
 
 
-def better_isogram(input_raster, neighborhood, distance, output):
+def better_isogram(input_raster, neighborhood, distance, base_contour, output):
     """
-    ç›´æ¥ä½¿ç”¨è½¯ä»¶è‡ªå¸¦çš„ç­‰å€¼çº¿å·¥å…·åˆ¶ä½œæ …æ ¼çš„ç­‰å€¼çº¿ï¼Œ
-    çº¿æ¡æ¯”è¾ƒæ›²æŠ˜åŒæ—¶è¾ƒä¸ºé›¶ç¢ï¼Œä¸åˆ©äºè§£è¯‘ï¼›
-    é›†æˆç„¦ç‚¹ç»Ÿè®¡å·¥å…·å¯¹åŸå§‹æ …æ ¼æ•°æ®å¤„ç†åå†ç”Ÿäº§ç­‰å€¼çº¿å›¾ï¼Œ
-    çº¿æ¡æ¸…æ™°å…‰æ»‘ï¼Œæ˜“äºè§£è¯‘å’Œä½¿ç”¨ã€‚
-    :param input_raster: è¾“å…¥æ …æ ¼
-    :param output: è¾“å‡ºæ›´å¥½çš„ç­‰å€¼çº¿æ•°æ®é›†ã€‚
-    :param neighborhood: {Int} é‚»åŸŸåˆ†æï¼ŒæŒ‡å®šçš„åƒå…ƒèŒƒå›´
-    :param distance: {Double} ç­‰å€¼çº¿é—´éš”
+    Ö±½ÓÊ¹ÓÃÈí¼ş×Ô´øµÄµÈÖµÏß¹¤¾ßÖÆ×÷Õ¤¸ñµÄµÈÖµÏß£¬
+    ÏßÌõ±È½ÏÇúÕÛÍ¬Ê±½ÏÎªÁãËé£¬²»ÀûÓÚ½âÒë£»
+    ¼¯³É½¹µãÍ³¼Æ¹¤¾ß¶ÔÔ­Ê¼Õ¤¸ñÊı¾İ´¦ÀíºóÔÙÉú²úµÈÖµÏßÍ¼£¬
+    ÏßÌõÇåÎú¹â»¬£¬Ò×ÓÚ½âÒëºÍÊ¹ÓÃ¡£
+    :param input_raster: ÊäÈëÕ¤¸ñ
+    :param neighborhood: {Int} ÁÚÓò·ÖÎö£¬Ö¸¶¨µÄÏñÔª·¶Î§
+    :param distance: {Double} µÈÖµÏß¼ä¸ô
+    :param base_contour: {Double} ÆğÊ¼µÈÖµÏßÖµ Ä¬ÈÏÖµÎªÁã
+    :param output: Êä³ö
     :return:
     """
+    arcpy.env.workspace = os.path.dirname(input_raster)
     
-    # è¿›è¡Œç„¦ç‚¹ç»Ÿè®¡åˆ†æ
+    # ½øĞĞ½¹µãÍ³¼Æ·ÖÎö
     
     fs = arcpy.sa.FocalStatistics
     nrt = arcpy.sa.NbrRectangle
     neighborhood = int(neighborhood)
     neighborhood = nrt(neighborhood, neighborhood, "cell")
     fs_result = fs(input_raster, neighborhood, "MEAN")
-    
-    # ç­‰å€¼çº¿è®¡ç®—
+    # name_random = randint(0,99999)
+    # fs_name = "temp{}".format(name_random)
+    # fs_result.save(fs_name)
+    arcpy.AddMessage("FocalStatistics Done")
+    # µÈÖµÏß¼ÆËã
     contour = "in_memory/contour"
-    arcpy.sa.Contour(fs_result, contour, float(distance))
+    # arcpy.sa.Contour(fs_result, contour, float(distance))
+    arcpy.sa.Contour(fs_result, output, float(distance), float(base_contour))
+    arcpy.AddMessage("Contour Done")
+    # arcpy.Delete_management(fs_name)
     
-    # è·å¾—è¾“å…¥æ …æ ¼èŒƒå›´çŸ¢é‡
-    # å…¶å®è¿™é‡Œå¯ä»¥ä½¿ç”¨æ …æ ¼è½¬é¢å·¥å…· arcpy.conversion.RasterToPolygon
-    domain = "in_memory/domain"
-    arcpy.RasterDomain_3d(input_raster, domain, "POLYGON")
     
-    # æ“¦é™¤èŒƒå›´å¤–çš„çº¿æ¡
-    
-    erase_left = "%scratchFolder%/out172005.shp"
-    # arcpy.AddMessage(neighborhood)
-    arcpy.Erase_analysis(contour, domain, erase_left)
-    # arcpy.AddMessage(neighborhood)
-    arcpy.Erase_analysis(contour, erase_left, output)
-    arcpy.Delete_management(erase_left)
+    # ÏÂÃæÎªÉ¶Òª²Á³ıÎÒ¼Ç²»ÇåÁË£¬µ«ÊÇ¾­ÎÒ²âÊÔ£¬²Á²¼²Á³ıĞ§¹û¶¼Ò»Ñù 20231017
+    # »ñµÃÊäÈëÕ¤¸ñ·¶Î§Ê¸Á¿
+    # ÆäÊµÕâÀï¿ÉÒÔÊ¹ÓÃÕ¤¸ñ×ªÃæ¹¤¾ß arcpy.conversion.RasterToPolygon
+    # ²»¹ıÇ°ÌáÊÇÊ¹ÓÃÕ¤¸ñ¼ÆËãÆ÷ÈÃÕ¤¸ñ³ËÒÔ0
+
+    # domain = "in_memory/domain"
+    # arcpy.RasterDomain_3d(input_raster, domain, "POLYGON")
+    # arcpy.AddMessage("Boundary Get Done")
+    # # ²Á³ı·¶Î§ÍâµÄÏßÌõ
+    #
+    # name_random = randint(0,99999)
+    # erase_left = "%scratchFolder%/out{}.shp".format(name_random)
+    # # arcpy.AddMessage(neighborhood)
+    # arcpy.Erase_analysis(contour, domain, erase_left)
+    # # arcpy.AddMessage(neighborhood)
+    # try:
+    #     arcpy.Erase_analysis(contour, erase_left, output)
+    # except Exception as e:
+    #     print "error"
+    # arcpy.Delete_management(erase_left)
 
 
 if __name__ == '__main__':
-    arcpy.AddMessage("\n|---------------------------------|")
-    arcpy.AddMessage(" -----  å·¥å…·ç”± GISèŸ åˆ¶ä½œå¹¶å‘å¸ƒ  ------")
-    arcpy.AddMessage("|---------------------------------|\n")
+    mark = 0 #=1±íÊ¾²âÊÔ
+    arcpy.env.overwriteOutput = True
     
-    args = tuple(
-        arcpy.GetParameterAsText(i) for i in range(
-            arcpy.GetArgumentCount()))
-    better_isogram(*args)
+    if mark != 1:
+        arcpy.AddMessage("\n|---------------------------------|")
+        arcpy.AddMessage(" -----  ¹¤¾ßÓÉ GISÜö ÖÆ×÷²¢·¢²¼  ------")
+        arcpy.AddMessage("|---------------------------------|\n")
+        
+        args = tuple(
+            arcpy.GetParameterAsText(i) for i in range(
+                arcpy.GetArgumentCount()))
+        better_isogram(*args)
+    else:
+        in_1 = r"D:\BaiduSyncdisk\3.RasterData\1.ProjectDB\14ÖÆÍ¼ÄÏº£ÇøÓò\ÖÆÍ¼ÄÏº£ÇøÓò.gdb\GEBCO_Area_3857underwater1"
+        in_2 = 7
+        in_3 = 100
+        in_4 = 0
+        in_5 = r"D:\BaiduSyncdisk\3.RasterData\1.ProjectDB\14ÖÆÍ¼ÄÏº£ÇøÓò\ÖÆÍ¼ÄÏº£ÇøÓò.gdb\Cont_100"
+        
+        better_isogram(in_1,in_2,in_3,in_4, in_5)
+        
+        
